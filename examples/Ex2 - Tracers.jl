@@ -1,4 +1,4 @@
-using AnalyticalEOR 
+using AnalyticalEOR, Plots
 
 swr = 0.2
 sor = 0.2
@@ -19,17 +19,11 @@ sj = 0.80
 
 wf = solve_waterflooding(si, sj, kr, μw, μo)
 
-wf.S̃
 
-plot_fw(wf)
+tracer = solve_tracer(wf)
 
-plot_sw_profile(wf, 0.1, 0.2, 0.3, 0.5)
-
-
-animate_sw_profile(wf)
+plot_tracer_fw(wf, tracer)
 
 
-
-
-
-
+plot_sw_profile(wf, tracer, 0.1)
+animate_sw_profile(wf, tracer)

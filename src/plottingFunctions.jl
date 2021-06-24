@@ -40,3 +40,34 @@ function animate_sw_profile(wf::WaterFlooding)
 
     gif(anim, fps=10)
 end
+
+
+# Tracer
+
+function plot_tracer_fw(wf, tracer)
+    fw(s) = fractional_flow(s, wf.kr, wf.μw, wf.μo)
+    plot_fw(wf)
+    plot!([0, tracer.sc], [0, fw(tracer.sc)], marker=:circle, ls=:dot, label="Tracer")
+end
+
+function plot_sw_profile(wf::WaterFlooding, c::Tracer, time::Float64)
+    plot_sw_profile(wf, time)
+    s, x = tracer_profile(wf, c, time)
+    xc = c.v * time
+
+    plot!(x, s, lw=0, fill=(0, 0.1, :yellowgreen), label=false)
+    plot!([xc, xc], [0, c.sc], lw=2, ls=:dash,  label="Tracer", color=:yellowgreen)
+
+end
+
+function animate_sw_profile(wf::WaterFlooding, c::Tracer)
+    dfw(sw) = fw_derivative(sw, wf.kr, wf.μw, wf.μo)
+    tmax = 1 / dfw(wf.S̃)
+    times = collect(range(0, 3 * tmax, length=300))
+    
+    anim = @animate for t in times
+        plot_sw_profile(wf, c, t)
+    end
+
+    gif(anim, fps=10)
+end

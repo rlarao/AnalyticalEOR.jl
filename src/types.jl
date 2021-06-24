@@ -12,7 +12,6 @@ struct RelPerms{T <: Real}
 end
 
 
-
 struct WaterFlooding{T <: Real}
     S̃::T
     Si::T
@@ -20,12 +19,10 @@ struct WaterFlooding{T <: Real}
     kr::RelPerms
     μw::T
     μo::T
+end 
 
-    # function WaterFlooding(Si::T, Sj::T, krs::RelPerms,  μw::T, μo::T) where {T <: Real}
-    #     μw, μo = μ
-    #     df(s) = fw_derivative(sw, krs, μw, μo)    
-    #     Δfw(sw) = (fw(sw) - fw(si)) / (sw - si) 
-    #     S̃  = find_zero(sw -> dfw(sw) - Δfw.(sw), (si + 0.0001, sj))
-    #     new(S̃, Si, Sj, krs, μw, μo)
-    # end
+struct Tracer
+    phase::Symbol
+    sc::Float64
+    v::Float64
 end

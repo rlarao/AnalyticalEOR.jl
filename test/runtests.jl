@@ -4,7 +4,7 @@ using Test
 @testset "AnalyticalEOR.jl" begin
 
     # Test relative permeability functions
-    @test water_rel_perm(0.5, 0.2, 0.2, 0.3, 3.0) ≈ 0.0374999
+    @test water_rel_perm(0.5, 0.2, 0.2, 0.3, 3.0) ≈ 0.0374999999
     @test water_rel_perm([0.5, 0.5], 0.2, 0.2, 0.3, 3.0) ≈ Vector([0.0375, 0.0375])
    
     @test oil_rel_perm(0.5, 0.2, 0.2, 0.3, 3.0) ≈ 0.0375
