@@ -3,8 +3,8 @@ using AnalyticalEOR
 swr = 0.2
 sor = 0.2
 
-kro0 = 1.0
 krw0 = 0.5
+kro0 = 1.0
 nw = 3.0
 no = 1.0
 

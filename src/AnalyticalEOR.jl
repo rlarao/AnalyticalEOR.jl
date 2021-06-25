@@ -8,6 +8,7 @@ using Plots
 include("types.jl")
 include("flowFunctions.jl")
 include("buckleyLeverett.jl")
+include("polymerFlooding.jl")
 include("tracers.jl")
 include("plottingFunctions.jl")
 
@@ -18,6 +19,6 @@ export solve_waterflooding, saturation_profile
 export solve_tracer, tracer_profile
 export plot_fw, plot_sw_profile, animate_sw_profile
 export plot_tracer_fw
-
+export solve_polymerflood
 
 end

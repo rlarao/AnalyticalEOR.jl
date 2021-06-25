@@ -15,6 +15,14 @@ function solve_tracer(wf::WaterFlooding; phase::Symbol=:water)
     return Tracer(:water, sc, vc(sc)) 
 end
 
+function solve_tracer(pf::PolymerFlooding; phase::Symbol=:water)
+    sb = pf.Sb
+    f(s) = fractional_flow(s, pf.kr1, pf.μw, pf.μo)
+    vc = f(sb) / sb
+
+    return Tracer(:water, sb, vc) 
+end
+
 
 
 function tracer_profile(wf::WaterFlooding, c::Tracer, time::Real)
@@ -34,4 +42,24 @@ function tracer_profile(wf::WaterFlooding, c::Tracer, time::Real)
     x[end] = 0.0
 
     return s, x
+end
+
+
+function tracer_profile(pf::PolymerFlooding, c::Tracer, time::Real)
+    si = pf.Si
+    sj = pf.Sj
+    sb = pf.Sb
+    ŝ = pf.S̃
+    sc = c.sc
+    vc = c.v
+
+    df(s) = fw_derivative(s, pf.kr2, pf.μw, pf.μo)
+
+    s = vcat([sc, sb ,sb, ŝ], collect(ŝ:0.01:sj))
+    x = zeros(length(s))
+    x[1] = vc * time
+    x[2:3] .= pf.VΔc * time
+    x[4:end] = df(s[4:end]) * time
+
+    return x, s
 end

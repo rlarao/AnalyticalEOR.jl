@@ -25,7 +25,7 @@ function saturation_profile(wf::WaterFlooding, time::Real)
     x[findall(s .> s̃)] = dfw(s[s .> s̃]) * time
     x[end] = 0.0
 
-    return s, x
+    return x, s
 end
 
 
