@@ -11,10 +11,14 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 <<<<<<< HEAD
+<<<<<<< HEAD
 ForwardDiff = "0.10"
 =======
 Roots = "1"
 >>>>>>> origin/compathelper/new_version/2021-06-25-00-32-38-035-1078273424
+=======
+Plots = "1"
+>>>>>>> origin/compathelper/new_version/2021-06-25-00-32-34-605-661851307
 julia = "1"
 
 [extras]
