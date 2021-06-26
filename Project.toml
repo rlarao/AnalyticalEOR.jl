@@ -4,21 +4,18 @@ authors = ["Ricardo Lara <rlara@utexas.edu> and contributors"]
 version = "0.1.0"
 
 [deps]
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+NLopt = "76087f3c-5699-56af-9a33-bf431cd00edd"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-<<<<<<< HEAD
-<<<<<<< HEAD
 ForwardDiff = "0.10"
-=======
-Roots = "1"
->>>>>>> origin/compathelper/new_version/2021-06-25-00-32-38-035-1078273424
-=======
 Plots = "1"
->>>>>>> origin/compathelper/new_version/2021-06-25-00-32-34-605-661851307
+Roots = "1"
 julia = "1"
 
 [extras]
