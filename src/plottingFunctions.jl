@@ -22,7 +22,7 @@ function plot_fw(μw::Float64, μo::Float64, krs::RelPerms...)
     for kr in krs
         fw(sw) = fractional_flow(sw, kr, μw, μo)
         sw = collect(kr.swr:0.01:1 - kr.sor)
-        display(plot!(sw, fw(sw), lw=3))
+        display(plot!(sw, fw(sw), lw=3, label=false))
     end
     plot!(lims=(0, 1))
     plot!(xlabel="Water Saturation, Sw", ylabel="Water Fractional Flow, fw")
@@ -95,6 +95,20 @@ function plot_sw_profile(pf::PolymerFlooding, time::Float64...)
     plot!(xlabel="Position, x", ylabel="Water Saturation, Sw")
 end
 
+
+function plot_sw_profile(pf::PolymerFlooding)
+    plot()
+    for t in time
+        x, s = saturation_profile(pf, t)    
+        display(plot!(x, s, lw=3.0, fill=(0, 0.1), label="Time $t"))
+    end
+    plot!(lims=(0, 1))
+    plot!(xlabel="Position, x", ylabel="Water Saturation, Sw")
+end
+
+
+
+
 function plot_sw_profile(pf::PolymerFlooding, c::Tracer, time::Float64)
     x, s = tracer_profile(pf, c, time)
     xp, sp = polymer_profile(pf, time)
@@ -122,3 +136,27 @@ function animate_sw_profile(pf::PolymerFlooding, c::Tracer)
 
     gif(anim, fps=10)
 end
+
+
+function plot_fw(pf::PolymerFlooding)
+    fww(s) = fractional_flow(s, pf.kr2, pf.μw, pf.μo)
+    fow(s) = fractional_flow(s, pf.kr1, pf.μw, pf.μo)
+
+    si = pf.Si
+    sj = pf.Sj
+    s̃ = pf.S̃
+    sb = pf.Sb
+    swr = pf.kr2.swr
+    sor = pf.kr2.sor
+    
+    sw = collect(swr:0.01:1 - sor)
+
+    plot_fw(pf.μw, pf.μo, pf.kr1, pf.kr2)
+    plot!(lims=(0, 1))
+    plot!([si sb s̃ sj], [fow(si) fow(sb) fww(s̃)  fww(sj) ], ms=5, labels=["si" "sb" "s*" "sj"], seriestype=:scatter)
+    plot!([-pf.D, s̃], [0, fww(s̃)], ls=:dash, color=:limegreen, label="Wettability Shock", lw=2)
+    plot!([sb, si], [fow(sb), fow(si)],  lw=2.5, ls=:dash, color=:maroon, label="Oil bank")
+    plot!(xlabel="Water Saturation, s", ylabel="Water Fractional Flow, f", legend=:bottomright)
+end
+
+# Reactive Transport

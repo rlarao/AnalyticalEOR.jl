@@ -1,12 +1,11 @@
 module AnalyticalEOR
 
 using Base:Real
-using ForwardDiff
+using ForwardDiff:derivative
 using Roots
 using Plots
 using DifferentialEquations
-using JuMP
-using NLopt
+
 
 include("types.jl")
 include("flowFunctions.jl")

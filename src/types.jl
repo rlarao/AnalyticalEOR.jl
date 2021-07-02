@@ -6,27 +6,24 @@ struct ExchangeConstants
     Z::Float64
 end
 
-struct IonExchangeTransport{T <: Float64}
-    ζᵢ::Vector{T}
-    ζⱼ::Vector{T}
+struct IonExchangeTransport
+    ζᵢ::Vector{Float64}
+    ζⱼ::Vector{Float64}
     ν::Vector{Int64}
-    K₂₁::T
-    K₃₁::T
-    K₂₃::T
-    Z::T
-    cᵢ::Vector{T}
-    cₘ₁::Vector{T}
-    cₘ₂::Vector{T}
-    cⱼ::Vector{T}
-    λ₁::T
-	λ₂::Vector{T} 
-	λ₃::Vector{T}
-    c₁::Vector{T}
-    c₂::Vector{T}
-    c₃::Vector{T}
-    c₄::Vector{T}
-    λ::Vector{T}
-    
+    K₂₁::Float64
+    K₃₁::Float64
+    K₂₃::Float64
+    Z::Float64
+    cᵢ::Vector{Float64}
+    cₘ₁::Vector{Float64}
+    cₘ₂::Vector{Float64}
+    cⱼ::Vector{Float64}
+	c::Matrix{Float64} 
+	ĉ::Matrix{Float64} 
+    λ::Vector{Float64}
+    σ::Vector{Float64}
+    W2::Symbol
+    W3::Symbol
 end
 
 struct RelPerms{T <: Float64}
@@ -64,6 +61,8 @@ struct PolymerFlooding{T <: Real}
     D::T
     Vb::T
     VΔc::T
+    s::Vector{Float64}
+    λ::Vector{Float64}
 end
 
 

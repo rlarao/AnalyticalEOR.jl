@@ -1,4 +1,3 @@
-using Base:Float64
 using Revise
 using AnalyticalEOR
 using Plots
@@ -42,7 +41,61 @@ Z = cec * ((1 - ϕ) / ϕ) * ρ # Conversion of cation exchange capacity into mol
 ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z)
 
 
-ie = solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec)
+ie = solve_Ion_Transport(ζⱼ, ζᵢ , ν, ec)
+
+c = ie.c
+σ = ie.σ
+λ = ie.λ
+t = 0.5
+
+
+plot(λ*t, c, layout=4, xlim=(0,1), label=false, lw=3.0)
+
+plot(σ, c[:,2], xlim=(0,20), yscale=:log10, ylim=(1e-5, 1))
+
+
+
+
+krww = RelPerms(swr=0.2,
+                sor=0.1,
+                krw0=0.5,
+                kro0=0.93,
+                nw=2.60,
+                no=1.10)
+
+krow = RelPerms(swr=0.2,
+                sor=0.2,
+                krw0=0.50,
+                kro0=0.93,
+                nw=2.,
+                no=1.80)
+
+μw = 1.03
+μo = 2.40
+
+plot_fw(μw, μo, krww, krow)
+
+
+si = 0.30
+sj = 0.90
+
+D = 0.3
+
+pf = solve_polymerflood(si, sj, krow, krww, D, μw, μo)
+s̃ = pf.S̃	
+sb = pf.Sb
+plot_fw(pf)
+plot!(aspect_ratio=:equal)
+plot!(legend=:outerright)
+
+plot_sw_profile(pf, 0.3)
+plot!(lims=(0,1))
+
+
+plot(pf.λ, pf.s, lw=3, xlim=(0,4), ylim=(0,1))
+
+λ
+pf.λ
 
 
 sol2, sol3 = M2_ODE_solutions(ie.cₘ₂[3], ie.cⱼ, ie.cₘ₁, ec)

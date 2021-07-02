@@ -1,7 +1,6 @@
 using AnalyticalEOR
 using Plots
 
-
 ζᵢ = [	0.47, # Na
 		0.049, # Mg
 		0.0115, # Ca
@@ -13,7 +12,6 @@ push!(ζᵢ, ζᵢ[1] + 2ζᵢ[2] + 2ζᵢ[3]) # Anion Cl conc. by charge balanc
 	0.00062, # Mg
 	0.00310, # Ca
 	]
-	
 push!(ζⱼ, ζⱼ[1] + 2ζⱼ[2] + 2ζⱼ[3] ) # Anion Cl conc. by charge balance
 
 ν =  [1, 2, 2, 1] # charges
@@ -24,22 +22,34 @@ K₃₁ = 10^1.83148
 K₂₃ =  10^-0.16
 
 # * Cation Exchange Capacity
-ρ = 2.8082271
+ρ = 2.8082271 # g/cm3
 ϕ = 0.59
-cec = 0.06
+cec = 0.06 # 
 Z = cec * ((1 - ϕ) / ϕ) * ρ # Conversion of cation exchange capacity into moles/liter
 
 ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z)
 
 
-c, λ = solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec)
+it = solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec)
+
+c = it.c
+λ = it.λ
+σ = it.σ
+
+plot(σ.+1, c[:,2], yscale=:log10, ylim=(1e-5, 1), xlim=(0, 20),
+		title=["Mg"], label=false, lw=2, ylabel="Concentration, M", marker=:circle)
+
+plot!(σ, c[:,2], yscale=:log10, ylim=(1e-5, 1), xlim=(0, 20),
+		title=["Mg"], label=false, lw=2, ylabel="Concentration, M", marker=:circle)
+
 
 
 t = 0.5
 plot(λ * t, c, xlim=(0, 1), layout=4,
-		title=["Na" "Mg" "Ca" "Cl"], label=false, lw=2, ylabel="Concentration, M", marker="circle")
+		title=["Na" "Mg" "Ca" "Cl"], label=false, lw=2, ylabel="Concentration, M", marker=:circle)
 
-
+c[:,2]
+λ
 
 cᵢ = ζᵢ .* ν
 cⱼ = ζⱼ .* ν
@@ -187,8 +197,6 @@ plot(λ * t, c₂, xlim=(0, 1),
 
 
 
-plot((1 ./ λ), c₂, yscale=:log10, ylim=(1e-5, 1), xlim=(0, 20),
-		title=["Mg"], label=false, lw=2, ylabel="Concentration, M", marker=:circle)
 
 
 
