@@ -31,7 +31,7 @@ end
 function plot_sw_profile(wf::WaterFlooding, time::Float64...)
     plot()
     for t in time
-        sw, x = saturation_profile(wf, t)    
+        x, sw = saturation_profile(wf, t)    
         display(plot!(x, sw, lw=3.0, fill=(0, 0.1), label="Time $t"))
     end
     plot!(lims=(0, 1))
