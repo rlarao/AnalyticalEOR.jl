@@ -10,7 +10,7 @@ function solve_tracer(wf::WaterFlooding; phase::Symbol=:water)
     # vw(s) = s < s̃ ? Δfw(s̃) : dfw(s)
     vc(s) = fw(s) ./ s
 
-    sc = fzero(s -> vc.(s) - dfw(s), (si + sj) / 2)
+    sc = fzero(s -> vc.(s) - dfw(s), 0.9*sj)
 
     return Tracer(:water, sc, vc(sc)) 
 end
@@ -41,7 +41,7 @@ function tracer_profile(wf::WaterFlooding, c::Tracer, time::Real)
     x[2:end - 1] = dfw(s[2:end - 1]) * time
     x[end] = 0.0
 
-    return s, x
+    return x, s
 end
 
 

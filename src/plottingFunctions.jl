@@ -31,8 +31,9 @@ end
 function plot_sw_profile(wf::WaterFlooding, time::Float64...)
     plot()
     for t in time
-        x, sw = saturation_profile(wf, t)    
-        display(plot!(x, sw, lw=3.0, fill=(0, 0.1), label="Time $t"))
+        t_label = round(t, digits=2)
+        x, sw = saturation_profile(wf, t) 
+        display(plot!(x, sw, lw=3.0, fill=(0, 0.1), label="Buckley Leverett", title="Injected PV = $t_label", lims=(0,1)))
     end
     plot!(lims=(0, 1))
     plot!(xlabel="Position, x", ylabel="Water Saturation, Sw")
@@ -63,7 +64,7 @@ end
 
 function plot_sw_profile(wf::WaterFlooding, c::Tracer, time::Float64)
     plot_sw_profile(wf, time)
-    s, x = tracer_profile(wf, c, time)
+    x, s = tracer_profile(wf, c, time)
     xc = c.v * time
 
     plot!(x, s, lw=0, fill=(0, 0.1, :yellowgreen), label=false)

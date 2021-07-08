@@ -1,4 +1,4 @@
-struct RelPerms{T <: Float64}
+mutable struct RelPerms{T <: Float64}
     swr::T
     sor::T
     krw0::T

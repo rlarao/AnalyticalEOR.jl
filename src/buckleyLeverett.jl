@@ -3,7 +3,7 @@ function solve_waterflooding(si, sj, kr, μw, μo)
     dfw(sw) = fw_derivative(sw, kr, μw, μo)
     Δfw(sw) = (fw(sw) - fw(si)) / (sw - si) 
 
-    S̃  = fzero(sw -> dfw(sw) - Δfw.(sw), (si + sj) / 2)
+    S̃  = fzero(sw -> dfw(sw) - Δfw.(sw), sj*0.9)
 
     WaterFlooding(S̃, si, sj, kr, μw, μo)
 end
