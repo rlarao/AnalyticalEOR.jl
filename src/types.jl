@@ -1,12 +1,13 @@
 
-struct ExchangeConstants
+mutable struct ExchangeConstants
     K₂₁::Float64
     K₃₁::Float64
     K₂₃::Float64
     Z::Float64
+    ν::Vector{Int64}
 end
 
-struct IonExchangeTransport
+mutable struct IonExchangeTransport
     ζᵢ::Vector{Float64}
     ζⱼ::Vector{Float64}
     ν::Vector{Int64}
@@ -24,6 +25,8 @@ struct IonExchangeTransport
     σ::Vector{Float64}
     W2::Symbol
     W3::Symbol
+    sol2
+    sol3
 end
 
 struct RelPerms{T <: Float64}

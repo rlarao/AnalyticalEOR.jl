@@ -1,7 +1,7 @@
 
-function solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec::ExchangeConstants)
-    cᵢ = ζᵢ .* ν
-    cⱼ = ζⱼ .* ν
+function solve_Ion_Transport(ζᵢ, ζⱼ, ec::ExchangeConstants)
+    cᵢ = ζᵢ .* ec.ν
+    cⱼ = ζⱼ .* ec.ν
 
     # * First intermediate point
     ĉᵢ = isotherm(cᵢ, ec)
@@ -9,18 +9,13 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec::ExchangeConstants)
     cₘ₁ = flowingConcentrations(ĉₘ₁, cⱼ[4], ec)
 
     # * Second intermediate point
-    cₘ₂ = solve_IntegralCurve(cₘ₁, cⱼ, ec)
-
-    # * Get intermediate points
-    sol2, sol3 = M2_ODE_solutions(cₘ₂[3], cⱼ, cₘ₁, ec)
-
+    cₘ₂, sol2, sol3 = solve_IntegralCurve2(cₘ₁, cⱼ, ec)
 
     σ₁ = 1
     σ₂ₘ₁ = eigenvectors([cₘ₁[2] cₘ₁[3] cⱼ[4]], ec)[1] 
     σ₂ₘ₂ = eigenvectors([cₘ₂[2] cₘ₂[3] cⱼ[4]], ec)[1]
     σ₃ₘ₂ = eigenvectors([cₘ₂[2] cₘ₂[3] cⱼ[4]], ec)[2]
     σ₃ⱼ =  eigenvectors([cⱼ[2] cⱼ[3] cⱼ[4]], ec)[2] 
-
 
     if σ₃ₘ₂ >= σ₃ⱼ
         𝒲₃ = :shock
@@ -35,7 +30,7 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec::ExchangeConstants)
         c₂ᵣ, c₃ᵣ, σᵣ, λᵣ  = RH_eigenvalues(cₘ₂, cₘ₁, ec)
     else
         𝒲₂ = :rarefication
-        c₂ᵣ, c₃ᵣ, σᵣ, λᵣ = integral_eigenvalues(cₘ₂, cₘ₂, 2, sol2, ec)
+        c₂ᵣ, c₃ᵣ, σᵣ, λᵣ = integral_eigenvalues(cₘ₂, cₘ₁, 2, sol2, ec)
     end
 
     c₄ₗ = cⱼ[4] * ones(length(c₃ₗ))
@@ -49,7 +44,6 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec::ExchangeConstants)
     
     σ = 1 ./ λ
     c₁ = c₄ .- c₃ .- c₂
-    
     
     c = [c₁ c₂ c₃ c₄]
     
@@ -67,8 +61,9 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec::ExchangeConstants)
             ec.Z,
             cᵢ, cₘ₁, cₘ₂, cⱼ,
             c, ĉ , λ, σ,
-            𝒲₂, 𝒲₃, 
-                        )
+            𝒲₂, 𝒲₃,
+            sol2, sol3
+            )
 end
 
 
@@ -85,12 +80,13 @@ function isotherm(c::T, ec::ExchangeConstants) where {T}
 		c₂, c₃, c₄ = c
 		c₁ = c₄ - c₃ - c₂
 	end
+        term = K₂₁ * c₂ / c₁ ^ ν[2] +  K₃₁ * c₃ / c₁ ^ ν[3]
 
-		ĉ₁ = (-1 + sqrt(1 + (4Z * (K₂₁ * c₂ + K₃₁ * c₃) / c₁^2))
-				) / ( 2((K₂₁ * c₂ + K₃₁ * c₃) / c₁^2) )
+		ĉ₁ = (-1 + sqrt(1 + (4Z * term ))
+				) / ( 2*term )
 		
-		ĉ₂ = K₂₁ * c₂ * ĉ₁^2 / c₁^2
-		ĉ₃ = K₃₁ * c₃ * ĉ₁^2 / c₁^2
+		ĉ₂ = K₂₁ * c₂ * ĉ₁^ν[2] / c₁^ν[2]
+		ĉ₃ = K₃₁ * c₃ * ĉ₁^ν[2] / c₁^ν[2]
 
 	return [ĉ₁, ĉ₂, ĉ₃, 0]
 end
@@ -150,6 +146,8 @@ function dc₂dc₃(c, ec::ExchangeConstants)
 end
 
 
+
+
 function integralcurves(u, p, t)
     c₄, ec = p
     c₂, c₃ = u, t
@@ -184,7 +182,7 @@ function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
 
     prob2 = ODEProblem(f2,
                     cₘ₁[2], 			    # u0
-                    (cₘ₁[3], cⱼ[3]), 		# tspan
+                    (cₘ₁[3], c₃ₘ₂), 		# tspan
                     (cⱼ[4], ec), 			# p
                         ) 
     sol2 = DifferentialEquations.solve(prob2, BS3(), reltol=1e-12)
@@ -199,7 +197,7 @@ function M2_ODE3(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
 
     prob3 = ODEProblem(f3, 
                     cⱼ[2],				    # u0
-                    (cⱼ[3], cₘ₁[3]), 		# tspan
+                    (cⱼ[3], c₃ₘ₂), 		# tspan
                     (cⱼ[4], ec))			# p
     sol3 = DifferentialEquations.solve(prob3, BS3(), reltol=1e-12)
 
@@ -223,6 +221,48 @@ function solve_IntegralCurve(cₘ₁, cⱼ, ec::ExchangeConstants)
 	return cₘ₂
 end
 
+
+function solve_IntegralCurve2(cₘ₁, cⱼ, ec::ExchangeConstants)
+	c₃ₘ₂ = collect(range(cⱼ[3], cₘ₁[3], length=100000))
+	
+    solved=false
+    c₃₂ = c₃ₘ₂[1]
+    i = 1
+
+    sol2 = nothing
+    sol3 = nothing
+    while solved==false && i < 100000
+        try 
+            sol2 = M2_ODE2(c₃₂, cⱼ, cₘ₁, ec)
+            solved = true
+        catch err
+            i += 1
+            c₃₂ = c₃ₘ₂[i]
+        end
+    end
+
+    solved=false
+    c₃₁ = c₃ₘ₂[end]
+    i = 0
+    while solved==false && i < 100000
+        try
+            sol3 = M2_ODE3(c₃₁, cⱼ, cₘ₁, ec)
+            solved = true
+        catch
+            c₃₁ = c₃ₘ₂[end-i]
+            i += 1
+        end
+    end
+
+    c₃ₘ₂ = fzero(c -> sol2(c) - sol3(c), (c₃₁+c₃₂)/2 )
+
+    c₂ₘ₂ = sol2(c₃ₘ₂)
+	cₘ₂ = [c₂ₘ₂, c₃ₘ₂, cⱼ[4]]
+	prepend!(cₘ₂, cₘ₂[3] - cₘ₂[2] - cₘ₂[1])
+	return cₘ₂, sol2, sol3
+end
+
+
 function RH_eigenvalues(cₗ, cᵣ, ec)
     ĉ₁ᵣ, ĉ₂ᵣ, ĉ₃ᵣ, ĉ₄ᵣ = isotherm(cᵣ, ec)
     ĉ₁ₗ, ĉ₂ₗ, ĉ₃ₗ, ĉ₄ₗ = isotherm(cₗ, ec)
@@ -234,7 +274,7 @@ end
 
 function integral_eigenvalues(cₗ, cᵣ, p, sol, ec)
     c₄ = cₗ[4]
-    c₃ = collect(range(cₗ[3], cᵣ[3], length=5))
+    c₃ = collect(range(cₗ[3], cᵣ[3], length=20))
     c₂ = [sol(c) for c in c₃]
 
     if p == 2

@@ -160,3 +160,30 @@ function plot_fw(pf::PolymerFlooding)
 end
 
 # Reactive Transport
+
+function plot_ODEs(it::IonExchangeTransport)
+    cₘ₁ = it.cₘ₁
+    cⱼ = it.cⱼ
+    cₘ₂ = it.cₘ₂
+
+    plot([ cₘ₁[3] cₘ₂[3] cⱼ[3]],
+    [ cₘ₁[2] cₘ₂[2] cⱼ[2]],
+    seriestype=:scatter, labels=["M1" "M2" "J"]
+    )
+    plot!(it.sol2.t, it.sol2.u, label=false)
+    plot!(it.sol3.t, it.sol3.u, label=false)
+    plot!( xlabel="C3", ylabel="C2",
+    )
+end
+
+
+function plot_velocities(it::IonExchangeTransport)
+    c = it.c
+    λ = it.λ
+
+    plot(λ[2:end-2], it.c[2:end-2,3],
+	    label=false, lw=2,
+        xlabel="Velocities",
+        ylabel="C3, M", marker=:circle)
+
+end
