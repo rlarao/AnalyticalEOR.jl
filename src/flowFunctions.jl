@@ -11,13 +11,7 @@ function water_rel_perm(sw::T, swr::P, sor::P, krw0::P, nw::P) where {T,P <: Flo
         krw = 0.0
     end
     
-end
-
-
-function water_rel_perm(sw::AbstractVector{T}, swr::P, sor::P, krw0::P, nw::P) where {T,P <: Float64}
-    water_rel_perm.(sw, swr::P, sor::P, krw0::P, nw::P)
-end
-
+end 
 
 function oil_rel_perm(sw::T, swr::P, sor::P, kro0::P, no::P) where {T,P <: Float64}
 
@@ -32,29 +26,27 @@ function oil_rel_perm(sw::T, swr::P, sor::P, kro0::P, no::P) where {T,P <: Float
     end
 end
 
+#* RelPerms Type
+function water_rel_perm(sw::Float64, kr::RelPerms)
+    water_rel_perm(sw, kr.swr, kr.sor, kr.krw0, kr.nw)
+end
+
+function oil_rel_perm(sw::Float64, kr::RelPerms)
+    oil_rel_perm(sw, kr.swr, kr.sor, kr.kro0, kr.no)
+end
+
+
+
+function water_rel_perm(sw::AbstractVector{T}, swr::P, sor::P, krw0::P, nw::P) where {T,P <: Float64}
+    water_rel_perm.(sw, swr::P, sor::P, krw0::P, nw::P)
+end
+
+
+
+
 
 function oil_rel_perm(sw::AbstractVector{T}, swr::P, sor::P, kro0::P, no::P) where {T,P <: Float64}
     oil_rel_perm.(sw, swr::P, sor::P, kro0::P, no::P)
-end
-
-
-function oil_rel_perm(sw::AbstractVector{T}, kr::RelPerms) where {T,P <: Float64}
-    swr = kr.swr
-    sor = kr.sor
-    kro0 = kr.kro0
-    no = kr.no
-    
-    oil_rel_perm.(sw, swr::P, sor::P, kro0::P, no::P)
-end
-
-
-function water_rel_perm(sw::AbstractVector{T}, kr::RelPerms) where {T <: Float64}
-    swr = kr.swr
-    sor = kr.sor
-    krw0 = kr.krw0
-    nw = kr.nw
-    
-    water_rel_perm.(sw, swr::T, sor::T, krw0::T, nw::T)
 end
 
 

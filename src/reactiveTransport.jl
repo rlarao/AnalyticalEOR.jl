@@ -9,7 +9,7 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ec::ExchangeConstants)
     cₘ₁ = flowingConcentrations(ĉₘ₁, cⱼ[4], ec)
 
     # * Second intermediate point
-    cₘ₂, sol2, sol3 = solve_IntegralCurve2(cₘ₁, cⱼ, ec)
+    cₘ₂, sol2, sol3 = solve_IntegralCurve(cₘ₁, cⱼ, ec)
 
     σ₁ = 1
     σ₂ₘ₁ = eigenvectors([cₘ₁[2] cₘ₁[3] cⱼ[4]], ec)[1] 
@@ -54,7 +54,7 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ec::ExchangeConstants)
 
     return IonExchangeTransport(ζᵢ,
             ζⱼ,
-            ν,
+            ec.ν,
             ec.K₂₁,
             ec.K₃₁,
             ec.K₂₃,
@@ -72,42 +72,73 @@ function isotherm(c::T, ec::ExchangeConstants) where {T}
     K₂₁ = ec.K₂₁
     K₃₁ = ec.K₃₁
     Z = ec.Z
+    ν = ec.ν
 
 	if size(c)[1] == 4
 		c₁, c₂, c₃ = c
-
 	else
 		c₂, c₃, c₄ = c
 		c₁ = c₄ - c₃ - c₂
 	end
-        term = K₂₁ * c₂ / c₁ ^ ν[2] +  K₃₁ * c₃ / c₁ ^ ν[3]
 
-		ĉ₁ = (-1 + sqrt(1 + (4Z * term ))
-				) / ( 2*term )
-		
-		ĉ₂ = K₂₁ * c₂ * ĉ₁^ν[2] / c₁^ν[2]
-		ĉ₃ = K₃₁ * c₃ * ĉ₁^ν[2] / c₁^ν[2]
+    β = 1
+    α = 0
+    if ν[2] == 1
+        β += K₂₁ * c₂ / c₁ 
+    elseif ν[2] == 2
+        α += K₂₁ * c₂ / c₁ ^ ν[2]
+    end
 
+    if ν[3] == 1
+        β += K₃₁ * c₃ / c₁ 
+    elseif ν[3] == 2
+        α += K₃₁ * c₃ / c₁ ^ ν[3]
+    end
+
+    ĉ₁ = (-β + sqrt(β^2 + 4 * α * Z)) / (2α)
+    
+    ĉ₂ = K₂₁ * c₂ * ĉ₁^ν[2] / c₁^ν[2]
+    ĉ₃ = K₃₁ * c₃ * ĉ₁^ν[3] / c₁^ν[3]
+ 
 	return [ĉ₁, ĉ₂, ĉ₃, 0]
 end
 
 
 function flowingConcentrations(ĉ, cⱼ₄, ec::ExchangeConstants)
     K₂₁ = ec.K₂₁
+    K₃₁ = ec.K₃₁
     K₂₃ = ec.K₂₃
+    ν = ec.ν
 
     ĉ₁, ĉ₂, ĉ₃ = ĉ
     
-    a = (1 + (ĉ₃ / ĉ₂ * K₂₃))^2
-    b = -(2 * cⱼ₄ * (1 + (ĉ₃ / ĉ₂ * K₂₃)) + (K₂₁ * ĉ₁^2 / ĉ₂))
-    c = cⱼ₄^2
+    α = 0
+    β = 1
 
-    c₂ = (-b - sqrt(b^2 - (4a * c))) / (2a)
-    c₁ = sqrt(K₂₁ * c₂ / ĉ₂) * ĉ₁
-    c₃ = c₂ * K₂₃ * ĉ₃ / ĉ₂
+    η₂ =  ĉ₂ / K₂₁ / ĉ₁^ ν[2] 
+    η₃ =  ĉ₃ / K₃₁ / ĉ₁^ ν[3] 
 
+    if ν[2] == 1
+        β += η₂
+    elseif ν[2] == 2
+        α += η₂
+    end
+
+    if ν[3] == 1
+        β += η₃
+    elseif ν[3] == 2
+        α += η₃
+    end
+
+    c₁ = (-β + sqrt(β^2 + 4* α * cⱼ₄)) / (2α)
+
+    c₂ = ĉ₂ * c₁^ ν[2] / K₂₁ / ĉ₁ ^ ν[2] 
+    c₃ = ĉ₃ * c₁^ ν[3] / K₃₁/ ĉ₁ ^ ν[3] 
+
+# return η₂
     return [c₁, c₂, c₃, cⱼ₄]
 end
+
 
 
 function eigenvectors(c, ec::ExchangeConstants)
@@ -137,11 +168,11 @@ end
 
 
 function dc₂dc₃(c, ec::ExchangeConstants)
-    ĉ₂₂, ĉ₂₃, ĉ₃₂, ĉ₃₃ = derivative_functions(c, ec::ExchangeConstants)
+    ĉ₂₂, ĉ₂₃, ĉ₃₂, ĉ₃₃ = derivative_functions(c, ec)
 
     σ₂ = 1 + (ĉ₂₂ + ĉ₃₃ - sqrt((ĉ₂₂ - ĉ₃₃)^2 + 4ĉ₂₃ * ĉ₃₂)) / 2
-    σ₃ = 1 + (ĉ₂₂ + ĉ₃₃ + sqrt((ĉ₂₂ - ĉ₃₃)^2 + 4ĉ₂₃ * ĉ₃₂)) / 2
-    
+	σ₃ = 1 + (ĉ₂₂ + ĉ₃₃ + sqrt((ĉ₂₂ - ĉ₃₃)^2 + 4ĉ₂₃ * ĉ₃₂)) / 2
+
     return [ĉ₂₃ / (σ₂ - 1 - ĉ₂₂), ĉ₂₃ / (σ₃ - 1 - ĉ₂₂)]
 end
 
@@ -155,37 +186,45 @@ function integralcurves(u, p, t)
 end
 
 
-function M2_ODE_solutions(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
+# function M2_ODE_solutions(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
     
-    f2(u, p, t) = integralcurves(u, p, t)[1]   
-    f3(u, p, t) = integralcurves(u, p, t)[2]
+#     f2(u, p, t) = integralcurves(u, p, t)[1]   
+#     f3(u, p, t) = integralcurves(u, p, t)[2]
 
-    prob2 = ODEProblem(f2,
-                    cₘ₁[2], 			    # u0
-                    (cₘ₁[3], cⱼ[3]), 		# tspan
-                    (cⱼ[4], ec), 			# p
-                        ) 
-    sol2 = DifferentialEquations.solve(prob2, BS3(), reltol=1e-12)
+#     prob2 = ODEProblem(f2,
+#                     cₘ₁[2], 			    # u0
+#                     (cₘ₁[3], cⱼ[3]), 		# tspan
+#                     (cⱼ[4], ec), 			# p
+#                         ) 
+#     sol2 = DifferentialEquations.solve(prob2, BS3(), reltol=1e-12)
 
-    prob3 = ODEProblem(f3, 
-                    cⱼ[2],				    # u0
-                    (cⱼ[3], cₘ₁[3]), 		# tspan
-                    (cⱼ[4], ec))			# p
-    sol3 = DifferentialEquations.solve(prob3, BS3(), reltol=1e-12)
+#     prob3 = ODEProblem(f3, 
+#                     cⱼ[2],				    # u0
+#                     (cⱼ[3], cₘ₁[3]), 		# tspan
+#                     (cⱼ[4], ec))			# p
+#     sol3 = DifferentialEquations.solve(prob3, Vern7(lazy=false), reltol=1e-12)
 
-    return sol2, sol3
-end
+#     return sol2, sol3
+# end
 
 function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
     
+
+    c₃ = 10 .^ range(log10(cₘ₁[3]), log10(cⱼ[3]), length=1000)
+
     f2(u, p, t) = integralcurves(u, p, t)[1]   
 
     prob2 = ODEProblem(f2,
                     cₘ₁[2], 			    # u0
                     (cₘ₁[3], c₃ₘ₂), 		# tspan
                     (cⱼ[4], ec), 			# p
-                        ) 
-    sol2 = DifferentialEquations.solve(prob2, BS3(), reltol=1e-12)
+                        )
+
+    sol2 = DifferentialEquations.solve(prob2, RadauIIA5() ,
+                                        reltol=1e-12,
+                                        abstol=1e-12,
+                                        alg_hints=[:interpolant],
+                                        saveat=c₃ )
 
     return sol2
 end
@@ -193,37 +232,30 @@ end
 
 function M2_ODE3(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
     
+    c₃ = 10 .^ range(log10(cⱼ[3]), log10(cₘ₁[3]),  length=1000)
+
+
     f3(u, p, t) = integralcurves(u, p, t)[2]
 
     prob3 = ODEProblem(f3, 
                     cⱼ[2],				    # u0
                     (cⱼ[3], c₃ₘ₂), 		# tspan
                     (cⱼ[4], ec))			# p
-    sol3 = DifferentialEquations.solve(prob3, BS3(), reltol=1e-12)
+                    
+    sol3 = DifferentialEquations.solve(prob3, RadauIIA5() ,
+                                        reltol=1e-12,
+                                        abstol=1e-12,
+                                        alg_hints=[:interpolant],
+                                        saveat=c₃,
+                                        )
 
     return sol3
 end
 
 
 function solve_IntegralCurve(cₘ₁, cⱼ, ec::ExchangeConstants)
-	i = 0
-	loss = 1
-	c₃ₘ₂ = rand(range(cⱼ[3], cₘ₁[3], length=10000))
-	
-    sol2 = M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec)
-    sol3 = M2_ODE3(c₃ₘ₂, cⱼ, cₘ₁, ec)
-    c₃ₘ₂ = fzero(c -> sol2(c) - sol3(c), c₃ₘ₂)
-
-    c₂ₘ₂ = sol2(c₃ₘ₂)
-
-	cₘ₂ = [c₂ₘ₂, c₃ₘ₂, cⱼ[4]]
-	prepend!(cₘ₂, cₘ₂[3] - cₘ₂[2] - cₘ₂[1])
-	return cₘ₂
-end
-
-
-function solve_IntegralCurve2(cₘ₁, cⱼ, ec::ExchangeConstants)
 	c₃ₘ₂ = collect(range(cⱼ[3], cₘ₁[3], length=100000))
+	# c₃ₘ₂ = collect(10 .^ range(log10(cⱼ[3]), log10(cₘ₁[3]), length=10000))
 	
     solved=false
     c₃₂ = c₃ₘ₂[1]
@@ -241,9 +273,11 @@ function solve_IntegralCurve2(cₘ₁, cⱼ, ec::ExchangeConstants)
         end
     end
 
+	c₃ₘ₂ = collect(range(cⱼ[3], cₘ₁[3], length=100000))
+
     solved=false
     c₃₁ = c₃ₘ₂[end]
-    i = 0
+    i = 1
     while solved==false && i < 100000
         try
             sol3 = M2_ODE3(c₃₁, cⱼ, cₘ₁, ec)
@@ -254,7 +288,7 @@ function solve_IntegralCurve2(cₘ₁, cⱼ, ec::ExchangeConstants)
         end
     end
 
-    c₃ₘ₂ = fzero(c -> sol2(c) - sol3(c), (c₃₁+c₃₂)/2 )
+    c₃ₘ₂ = fzero(c -> sol2(c) - sol3(c), c₃₁ )
 
     c₂ₘ₂ = sol2(c₃ₘ₂)
 	cₘ₂ = [c₂ₘ₂, c₃ₘ₂, cⱼ[4]]

@@ -1,16 +1,16 @@
 using AnalyticalEOR
 using Plots
 
-ζᵢ = [	0.47, # Na
-		0.049, # Mg
-		0.0115, # Ca
+ζᵢ = [	1e-9, # Na
+		1e-9, # Mg
+		5e-3, # Ca
 		]
 push!(ζᵢ, ζᵢ[1] + 2ζᵢ[2] + 2ζᵢ[3]) # Anion Cl conc. by charge balance
 
 # * Injected concentrations
-ζⱼ = [	0.00166, # Na
-	0.00062, # Mg
-	0.00310, # Ca
+ζⱼ = [	95e-3, 	# Na
+		2.6e-3, # Mg
+		1e-9, 	# Ca
 	]
 push!(ζⱼ, ζⱼ[1] + 2ζⱼ[2] + 2ζⱼ[3] ) # Anion Cl conc. by charge balance
 
@@ -27,12 +27,38 @@ K₂₃ =  10^-0.16
 cec = 0.06 # 
 Z = cec * ((1 - ϕ) / ϕ) * ρ # Conversion of cation exchange capacity into moles/liter
 
-ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z)
+ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z, ν)
+it = solve_Ion_Transport(ζᵢ, ζⱼ, ec)
+
+plot_ODEs(it)
+plot!(scale=:log10, ylim=(1e-12, 1), xlim=(1e-10, 1))
 
 
-it = solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec)
+plot(it.sol2, label=false)
+plot!(it.sol3, label=false)
+
+
+plot(it.sol3(collect(range(cⱼ[3], cₘ₂[3], length=10))))
+plot!(it.sol2(collect(range(cₘ₁[3], cₘ₂[3], length=10))))
+
+
+
+
+cᵢ = ζᵢ .* ν
+cⱼ = ζⱼ .* ν
+
+# * First intermediate point
+ĉᵢ = isotherm(cᵢ, ec)
+ĉₘ₁ = ĉᵢ
+cₘ₁ = flowingConcentrations(ĉₘ₁, cⱼ[4], ec)
+
+cₘ₂, sol2, sol3 = solve_IntegralCurve(cₘ₁, cⱼ, ec)
+
+
+
 
 c = it.c
+cᵢ = it.cᵢ
 λ = it.λ
 σ = it.σ
 

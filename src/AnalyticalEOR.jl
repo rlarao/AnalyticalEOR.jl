@@ -28,5 +28,6 @@ export solve_IntegralCurve, solve_IntegralCurve2, M2_ODE_solutions, IonExchangeT
 export M2_ODE2, M2_ODE3, M2_ODE_solutions, integralcurves, dc₂dc₃, derivative_functions
 export eigenvectors, integral_eigenvalues, RH_eigenvalues
 export plot_ODEs, plot_velocities
+export isotherm2, flowingConcentrations2
 
 end
