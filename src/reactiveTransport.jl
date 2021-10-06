@@ -220,7 +220,7 @@ function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
                     (cⱼ[4], ec), 			# p
                         )
 
-    sol2 = DifferentialEquations.solve(prob2, RadauIIA5() ,
+    sol2 = DifferentialEquations.solve(prob2, CVODE_BDF()  ,
                                         reltol=1e-12,
                                         abstol=1e-12,
                                         alg_hints=[:interpolant],
