@@ -1,5 +1,9 @@
 using AnalyticalEOR
 using Plots
+using Roots
+using NumericalIntegration
+
+theme(:dao; grid_lw=0.2)
 
 
 kr_ww = RelPerms(swr=0.11,
@@ -15,7 +19,15 @@ kr_ow = RelPerms(swr=0.11,
                 kro0=0.5,
                 nw=2.,
                 no=3.)
-s = collect(0:0.01:1)
+s = collect(0.11:0.01:0.9)
+s2 = collect(0.11:0.01:0.84)
+
+
+
+M_ww = krw_ww(1-0.10) *5/kro_ww(0.11)
+M_ow = krw_ow(1-0.10) *5/kro_ow(0.16)
+
+
 
 krw_ww(s) = water_rel_perm(s, kr_ww)
 kro_ww(s) = oil_rel_perm(s, kr_ww)
@@ -29,8 +41,8 @@ plot!(s, kro_ww.(s), color=:dodgerblue2, lw=2.5, alpha=0.7, ls=:dash)
 plot!(lims=(0,1), xlabel="Water saturation, s", ylabel="Relative permeability",
 size=(450, 400), legend=false)
 
-plot!(s, krw_ow.(s), color=:orangered3, lw=3, alpha=0.7 )
-plot!(s, kro_ow.(s), color=:orangered3, lw=3, alpha=0.7, ls=:dash )
+plot!(s2, krw_ow.(s2), color=:orangered3, lw=3, alpha=0.7 )
+plot!(s2, kro_ow.(s2), color=:orangered3, lw=3, alpha=0.7, ls=:dash )
 
 
 coo_ww = 0.002098
@@ -184,8 +196,8 @@ x[2n+6] = 1.0
 
 plot(y, s_wf, lw=2, color=:orangered3, fill=(0,0.03),ls=:dash, label="Waterflooding")
 
-plot!(x, s, lw=3, color=:dodgerblue2, fill=(0,0.07), label="Glycine Inj")
-plot!(xlabel="Dimensionless distance, x", ylabel="Water saturation, w", xlim=(0,1), ylim=(0,1), legend=(0.8, 0.6),
+plot(x, s, lw=3, color=:dodgerblue2, fill=(0,0.07), label="Glycine Inj")
+plot!(xlabel="Dimensionless distance", ylabel="Water saturation, s", xlim=(0,1), ylim=(0,1), legend=(0.8, 0.6),
 size=(550,420))
 hline!([sj, s1, s2 , s3, s4 , si], color=:black, lw=0.5, ls=:dash, label=false)
 
@@ -207,7 +219,7 @@ plot!(ann=(x3+0.03, 0.25, L"\mathcal{W_1}"), annotationfontsize=10)
 
 
 vline!([x3 x2 x1], color=:black, lw=0.5, ls=:dash, label=false)
-plot!(title="b) Glycine 5 wt%")
+plot!(title="b) Glycine 5 wt%", titlelocation=:left)
 
 savefig("sw_profile_gly5.svg")
 
@@ -238,5 +250,107 @@ y[m+2] = vs5 *t
 y[m+3] = vs5 *t
 y[m+4] = 1
 
-plot!(xlabel="Dimensionless distance, x", ylabel="Water saturation, w", xlim=(0,1), ylim=(0,1), legend=false,
+plot!(xlabel="Dimensionless distance, x", ylabel="Water saturation, s", xlim=(0,1), ylim=(0,1), legend=false,
 size=(550,400))
+
+
+
+
+t= 0.35
+
+n = 10
+sj
+s1
+s2
+s3
+s4
+si
+s5
+sj2
+si
+vs5
+function get_saturation_wf(t)
+    s5 = 0.40325647828334443
+    sj2 = 0.84
+    si = 0.11
+
+    vs5 = 2.5605429823967625
+    m = 50
+    s_wf = vcat(sj2,
+            collect(range(sj2, s5, length=m)),
+            [s5, si, si],
+    )
+
+    y = Vector{Float64}(undef, length(s_wf))
+
+    y[1] = 0.
+    y[2:1+m] = dfow(s_wf[2:1+m]) *t
+    y[m+2] = vs5 *t
+    y[m+3] = vs5 *t
+    y[m+4] = 1
+
+    return min.(y, 1.0), s_wf
+
+end
+
+function get_saturation_g5(t)
+    n = 10
+    sj = 0.9
+    s1 = 0.7930208075249362
+    s2 = 0.746030616822337
+    s3 = 0.7313460677378152
+    s4 = 0.3477144312685623
+    si = 0.11
+
+    vs1 = 0.5010653847918979 
+    vs3 = 0.941430207906886
+    vs4 = 2.441468765915162
+
+    s = vcat(sj, collect(range(sj,s1, length=n)),
+            [s2],
+            collect(range(s2,s3, length=n)),
+            [s4, s4,  si, si])
+    x = Vector{Float64}(undef, length(s))
+
+    x[1] = 0.0
+    x[2:n+1] = dfww(s[2:n+1]) * t
+    x[n+2] = vs1 * t 
+    x[n+3:2n+2] = dfmw(s[n+3:2n+2]) * t
+    x[2n+3] = vs3 * t
+    x[2n+4] = vs4 * t
+    x[2n+5] = vs4 * t
+    x[2n+6] = 1.0
+    return min.(x, 1.0), s
+end
+
+
+times = collect(0.0:0.01:5)
+RF = similar(times)
+RF_g5 = similar(times)
+RF_g1 = similar(times)
+
+for (i, t) in enumerate(times)
+    x, s = get_saturation_g5(t)
+#     RF_g5[i] = (integrate(x, s)-0.11) / (0.9-0.11 ) * 100
+#     RF_g5[i] = (0.79 - (0.9 - integrate(x,s))) * 100
+    RF_g5[i] = (0.9 - (1.0 - integrate(x,s))) * 100
+
+    x, s = get_saturation_g1(t)
+#     RF_g1[i] = (0.79 - (0.9 - integrate(x,s))) * 100
+    RF_g1[i] = (0.9 - (1.0 - integrate(x,s))) * 100
+
+    x, s = get_saturation_wf(t)
+#     RF[i] = (0.79 - (0.9 - integrate(x,s))) * 100
+    RF[i] = (0.9 - (1.0 - integrate(x,s))) * 100
+end
+
+
+plot(times, RF_g5, color=:dodgerblue2, lw=3, alpha=0.6, label="SW-G5")
+plot!(times, RF_g1, color=:forestgreen, lw=3, alpha=0.6, label="SW-G1")
+plot!(times, RF, color=:orangered, lw=3, alpha=0.6, label="FB")
+
+plot!(legend=:bottomright)
+plot!(xlims=(0,5), ylims=(0,100), size=(450,400))
+plot!(xlabel="Injected PV", ylabel="Recovery Factor, % OOIP")
+
+savefig("recovery_factor.svg")

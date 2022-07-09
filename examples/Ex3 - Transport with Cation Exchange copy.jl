@@ -7,9 +7,6 @@ using AnalyticalEOR
 # CEC in mol/L
 # Equilibrium constants
 
-
-
-
 # * Initial concentrations
 ζᵢ = [	1e-9, # Na
 		1e-9, # Mg
@@ -38,7 +35,7 @@ K₂₃ =  10^-0.16
 cec = 0.06
 Z = cec * ((1 - ϕ) / ϕ) * ρ # Conversion of cation exchange capacity into moles/liter
 
-ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z)
+ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z, ν)
 
 
 ie = solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec)

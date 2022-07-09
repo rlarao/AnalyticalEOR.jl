@@ -1,5 +1,6 @@
 using AnalyticalEOR
-using Plots
+using Plot
+using LaTeXStrings
 
 
 kr_ww = RelPerms(swr=0.11,
@@ -177,10 +178,52 @@ x[n+5] = 1.0
 
 
 plot(y, s_wf, lw=2, color=:orangered3, fill=(0,0.03),ls=:dash, label="Waterflooding", xlim=(0,1))
-plot!(x, s, lw=3, color=:dodgerblue2, fill=(0,0.07), label="Glycine Inj")
-plot!(xlabel="Dimensionless distance, x", ylabel="Water saturation, w", xlim=(0,1), ylim=(0,1), legend=(0.8, 0.6),
-size=(550,420), title="a) Glycine 1 wt%")
+plot!(x, s, lw=3, color=:forestgreen, fill=(0,0.05), label="Glycine Inj")
+plot!(xlabel="Dimensionless distance", ylabel="Water saturation, s", xlim=(0,1), ylim=(0,1), legend=(0.8, 0.6),
+size=(550,420), title="a) Glycine 1 wt%", titlelocation=:left)
 hline!([sj, s1, s2, si], color=:black, lw=0.5, ls=:dash, label=false)
+
+
+x[1] = 0
+
+
+vs1
+vs3
+sj
+si
+s1
+s2
+
+function get_saturation_g1(t)
+        sj = 0.8944005607966523
+        si = 0.11
+        s1 = 0.7518598702831422
+        s2 = 0.40538250237934736
+
+        vs1 = 0.6095418616330046
+        vs3 = 2.5605429823967616
+
+        n = 10
+
+        s = vcat(sj, collect(range(sj,s1, length=n)),
+                [s2, s2, si, si ])
+        x = Vector{Float64}(undef, length(s))
+
+        x[1] = 0.0
+        x[2:n+1] = dfmw1(s[2:n+1]) * t
+        x[n+2] = vs1 * t 
+        x[n+3] = vs3 * t 
+        x[n+4] = vs3 * t 
+        x[n+5] = 1.0 
+
+        return min.(x, 1), s
+end
+
+
+
+
+
+
 
 
 plot!(ann=(0.5, sj+0.03, L"s_J"))
@@ -191,7 +234,7 @@ plot!(ann=(0.87, 0.95, L"t \equal 0.35 \ PV"))
 
 x3 = Δc3 *t
 x2 = vs1 * t
-# x1 = vs1 * t
+x1 = vs1 * t
 # plot!(ann=(x1+0.03, 0.25, L"\mathcal{W_3}"), annotationfontsize=10)
 plot!(ann=(x2+0.03, 0.25, L"\mathcal{W_2}"), annotationfontsize=10)
 plot!(ann=(x3+0.03, 0.25, L"\mathcal{W_1}"), annotationfontsize=10)

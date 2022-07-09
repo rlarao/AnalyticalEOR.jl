@@ -210,7 +210,7 @@ end
 function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
     
 
-    c₃ = 10 .^ range(log10(cₘ₁[3]), log10(cⱼ[3]), length=1000)
+    c₃ = 10 .^ range(log10(cₘ₁[3]), log10(cⱼ[3]), length=1000000)
 
     f2(u, p, t) = integralcurves(u, p, t)[1]   
 
@@ -220,10 +220,12 @@ function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
                     (cⱼ[4], ec), 			# p
                         )
 
-    sol2 = DifferentialEquations.solve(prob2, CVODE_BDF()  ,
-                                        reltol=1e-12,
-                                        abstol=1e-12,
+    sol2 = DifferentialEquations.solve(prob2, BS3()  ,
+                                        reltol=1e-7,
+                                        abstol=1e-7,
                                         alg_hints=[:interpolant],
+                                        # maxiters=1e7,
+                                        # alg_hints=[:stiff],
                                         saveat=c₃ )
 
     return sol2
@@ -232,7 +234,7 @@ end
 
 function M2_ODE3(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
     
-    c₃ = 10 .^ range(log10(cⱼ[3]), log10(cₘ₁[3]),  length=1000)
+    c₃ = 10 .^ range(log10(cⱼ[3]), log10(cₘ₁[3]),  length=1000000)
 
 
     f3(u, p, t) = integralcurves(u, p, t)[2]
