@@ -96,6 +96,7 @@ function fw_derivative(sw::Union{T,AbstractVector{T}}, swr::P, sor::P, krw0::P, 
     derivative.(sw ->  fractional_flow(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
 end
 
+
 function fw_derivative(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo::P) where {T,P <: Float64}
     swr = kr.swr
     sor = kr.sor
@@ -108,4 +109,36 @@ function fw_derivative(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo
 end
 
 
+function fw_derivative2(sw::Union{T,AbstractVector{T}}, swr::P, sor::P, krw0::P, kro0::P, nw::P, no::P, μw::P, μo::P) where {T,P <: Float64}
+    derivative.(sw ->  fw_derivative(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
+
+
+function fw_derivative2(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo::P) where {T,P <: Float64}
+    swr = kr.swr
+    sor = kr.sor
+    krw0 = kr.krw0
+    nw = kr.nw
+    kro0 = kr.kro0
+    no = kr.no
+    
+    derivative.(sw ->  fw_derivative(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
+
+
+function fw_derivative3(sw::Union{T,AbstractVector{T}}, swr::P, sor::P, krw0::P, kro0::P, nw::P, no::P, μw::P, μo::P) where {T,P <: Float64}
+    derivative.(sw ->  fw_derivative2(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
+
+
+function fw_derivative3(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo::P) where {T,P <: Float64}
+    swr = kr.swr
+    sor = kr.sor
+    krw0 = kr.krw0
+    nw = kr.nw
+    kro0 = kr.kro0
+    no = kr.no
+    
+    derivative.(sw ->  fw_derivative2(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
 

@@ -10,9 +10,17 @@ function plot_fw(wf::WaterFlooding)
 
     plot(sw, fw(sw), lw=3, label=false)
     plot!(lims=(0, 1), title="Water Fractional Flow")
-    plot!([swi s̃w swj], [fw(swi) fw(s̃w) fw(swj)], labels=["Swi" "S̃w" "Swj"], seriestype=:scatter)
-    plot!([swi, s̃w], [fw(swi), fw(s̃w)], ls=:dash, label="Shock")
     plot!(xlabel="Water Saturation, Sw", ylabel="Water Fractional Flow, fw")
+
+
+    if !isnan(s̃w)
+        plot!([swi s̃w swj], [fw(swi) fw(s̃w) fw(swj)], labels=["Swi" "S̃w" "Swj"], seriestype=:scatter)
+        plot!([swi, s̃w], [fw(swi), fw(s̃w)], ls=:dash, label="Shock")
+    else
+
+        plot!([swi swj], [fw(swi) fw(swj)], labels=["Swi" "Swj"], seriestype=:scatter)
+
+    end
 end
 
 
@@ -30,12 +38,13 @@ end
 
 function plot_sw_profile(wf::WaterFlooding, time::Float64...)
     plot()
-    for t in time
-        sw, x = saturation_profile(wf, t)    
-        display(plot!(x, sw, lw=3.0, fill=(0, 0.1), label="Time $t"))
-    end
     plot!(lims=(0, 1))
     plot!(xlabel="Position, x", ylabel="Water Saturation, Sw")
+    for t in time
+        x, sw = saturation_profile(wf, t)    
+        t = round(t; digits= 2)
+        display(plot!(x, sw, lw=3.0, fill=(0, 0.1), label="Time $t"))
+    end
 end
 
 
@@ -98,30 +107,32 @@ end
 
 function plot_sw_profile(pf::PolymerFlooding)
     plot()
-    for t in time
-        x, s = saturation_profile(pf, t)    
-        display(plot!(x, s, lw=3.0, fill=(0, 0.1), label="Time $t"))
-    end
     plot!(lims=(0, 1))
     plot!(xlabel="Position, x", ylabel="Water Saturation, Sw")
+
+    x, s = saturation_profile(pf, t)    
+    t = round(t; digits=2)
+    plot!(x, s, lw=3.0, fill=(0, 0.1), label="Time $t", title="PVI = $t")
 end
 
 
 
 
 function plot_sw_profile(pf::PolymerFlooding, c::Tracer, time::Float64)
-    x, s = tracer_profile(pf, c, time)
+    x, s = saturation_profile(pf,time)
+    xt, st = tracer_profile(pf, c, time)
     xp, sp = polymer_profile(pf, time)
     xc = c.v * time
     
-    plot_sw_profile(pf, time)
+    plot(x, s, lw=3.0, fill=(0,0.1), label="Water Saturation", lims=(0,1))
     
-    plot!(x, s, lw=0, fill=(0, 0.1, :yellowgreen), label=false)
+    plot!(xt, st, lw=0, fill=(0, 0.1, :yellowgreen), label=false)
     plot!([xc, xc], [0, c.sc], lw=3, ls=:dot,  label="Tracer", color=:yellowgreen)
     
     plot!(xp, sp, lw=0, fill=(0, 0.2, :deeppink2), label=false)
     plot!([xp[1], xp[1]], [0, pf.Sb], lw=3, ls=:dot,  label="Polymer", color=:deeppink2)
 
+    plot!(xlabel="Position, x", ylabel="Water Saturation, Sw")
 end
 
 
