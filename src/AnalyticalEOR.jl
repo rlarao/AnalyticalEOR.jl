@@ -16,8 +16,9 @@ include("reactiveTransport.jl")
 
 export RelPerms, WaterFlooding
 export water_rel_perm, oil_rel_perm, krw_derivative, kro_derivative
+export plot_sat_profile, animate_sat_profile, plot_fractional_flow, solve_chemical_flooding
 export fractional_flow, fw_derivative, fw_derivative2, fw_derivative3
-export solve_waterflooding, saturation_profile
+export solve_waterflooding, get_saturation_speeds, solve_wf, shock_is_admissible, find_shock_spreading
 export solve_tracer, tracer_profile
 export plot_fw, plot_sw_profile, animate_sw_profile
 export plot_tracer_fw

@@ -1,3 +1,4 @@
+using Roots, ForwardDiff
 
 mutable struct ExchangeConstants
     K₂₁::Float64
@@ -44,12 +45,38 @@ end
 
 
 struct WaterFlooding{T <: Real}
-    S̃::T
-    Si::T
-    Sj::T
+    si::T
+    sj::T
     kr::RelPerms
-    μw::T
-    μo::T
+    f::Function
+    df::Function
+    d²f::Function
+
+    function WaterFlooding(;si::T, sj::T, kr::RelPerms, μw::T, μo::T) where T <: Float64
+
+        f(s) = fractional_flow(s, kr, μw, μo)
+        df(s) = ForwardDiff.derivative.(s -> f(s), s)
+        d²f(s) = ForwardDiff.derivative.(s -> df(s), s)
+        new{Float64}(si, sj, kr, f, df, d²f)
+    end
+end 
+
+
+struct ChemicalFlooding{T <: Real}
+    sj::T
+    kr::Vector{RelPerms}
+    f::Vector{Function}
+    df::Vector{Function}
+    d²f::Vector{Function}
+    D::Vector{T}
+    wf::WaterFlooding
+
+    function ChemicalFlooding(;si::T, sj::T, kr::RelPerms, μw::T, μo::T) where T <: Float64
+        f(s) = fractional_flow(s, kr, μw, μo)
+        df(s) = ForwardDiff.derivative.(s -> f(s), s)
+        d²f(s) = ForwardDiff.derivative.(s -> df(s), s)
+        new{Float64}(si, sj, kr, μw, μo, f, df, d²f)
+    end
 end 
 
 struct PolymerFlooding{T <: Real}
