@@ -11,7 +11,7 @@ kr = RelPerms(swr=0.2,
 μw = 1.0
 μo = 5.0
 
-sj = 0.50
+sj = 0.
 si = 0.80
 
 wf = WaterFlooding(si=si, sj=sj, kr=kr, μw=μw, μo=μo)
@@ -40,6 +40,14 @@ kr2 = RelPerms(swr=0.2,
                 no=2.0)
             
 kr_list = [kr2, kr1]
+
+
+ChemicalFlooding(si = 0.2,
+                 sj = 0.8,
+                 krs = [kr1 kr2],
+                 μw = 1.0,
+                 μo = 5.0
+                 )
 
 f_list = [s -> fractional_flow(s, kr, μw, μo) for kr in kr_list]
 df_list = [s -> ForwardDiff.derivative.(s -> f(s), s) for f in f_list]

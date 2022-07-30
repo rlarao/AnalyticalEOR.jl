@@ -45,62 +45,34 @@ end
 
 
 struct WaterFlooding{T <: Real}
-    si::T
-    sj::T
     kr::RelPerms
+    μw::Float64
+    μo::Float64
     f::Function
     df::Function
     d²f::Function
 
-    function WaterFlooding(;si::T, sj::T, kr::RelPerms, μw::T, μo::T) where T <: Float64
-
+    function WaterFlooding(;kr::RelPerms, μw::T, μo::T) where T <: Float64
         f(s) = fractional_flow(s, kr, μw, μo)
         df(s) = ForwardDiff.derivative.(s -> f(s), s)
         d²f(s) = ForwardDiff.derivative.(s -> df(s), s)
-        new{Float64}(si, sj, kr, f, df, d²f)
+        new{Float64}(kr, μw, μo, f, df, d²f)
     end
 end 
 
 
 struct ChemicalFlooding{T <: Real}
-    sj::T
-    kr::Vector{RelPerms}
+    kr::Vector{RelPerms{Float64}}
     f::Vector{Function}
     df::Vector{Function}
     d²f::Vector{Function}
     D::Vector{T}
     wf::WaterFlooding
 
-    function ChemicalFlooding(;si::T, sj::T, kr::RelPerms, μw::T, μo::T) where T <: Float64
-        f(s) = fractional_flow(s, kr, μw, μo)
-        df(s) = ForwardDiff.derivative.(s -> f(s), s)
-        d²f(s) = ForwardDiff.derivative.(s -> df(s), s)
-        new{Float64}(si, sj, kr, μw, μo, f, df, d²f)
+    function ChemicalFlooding(;wf::WaterFlooding, krs::Vector{RelPerms{Float64}}, D::Vector{T}) where T <: Float64
+        fs = [s -> fractional_flow(s, kr, wf.μw, wf.μo) for kr in krs]
+        dfs = [s -> ForwardDiff.derivative.(s -> f(s), s) for f in fs]
+        d²fs = [s -> ForwardDiff.derivative.(s -> df(s), s) for df in dfs]
+        new{Float64}(krs, fs, dfs, d²fs, D, wf)
     end
 end 
-
-struct PolymerFlooding{T <: Real}
-    S̃::T
-    Si::T
-    Sj::T
-    kr1::RelPerms
-    kr2::RelPerms
-    μw::T
-    μo::T
-    Sb::T
-    D::T
-    Vb::T
-    VΔc::T
-    s::Vector{Float64}
-    λ::Vector{Float64}
-end
-
-
-
-
-struct Tracer
-    phase::Symbol
-    sc::Float64
-    v::Float64
-end
-

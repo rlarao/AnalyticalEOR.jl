@@ -38,7 +38,7 @@ Z = cec * ((1 - ϕ) / ϕ) * ρ # Conversion of cation exchange capacity into mol
 ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z, ν)
 
 
-ie = solve_Ion_Transport(ζᵢ, ζⱼ, ν, ec)
+ie = solve_Ion_Transport(ζᵢ, ζⱼ, ec)
 
 using Plots
 t = 0.3
