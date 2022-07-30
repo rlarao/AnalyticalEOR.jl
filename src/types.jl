@@ -1,6 +1,6 @@
 using Roots, ForwardDiff
 
-mutable struct ExchangeConstants
+mutable struct IonExchangeProblem
     K₂₁::Float64
     K₃₁::Float64
     K₂₃::Float64
@@ -8,7 +8,7 @@ mutable struct ExchangeConstants
     ν::Vector{Int64}
 end
 
-mutable struct IonExchangeTransport
+mutable struct IonExchangeSolution
     ζᵢ::Vector{Float64}
     ζⱼ::Vector{Float64}
     ν::Vector{Int64}
@@ -26,8 +26,6 @@ mutable struct IonExchangeTransport
     σ::Vector{Float64}
     W2::Symbol
     W3::Symbol
-    sol2
-    sol3
 end
 
 struct RelPerms{T <: Float64}

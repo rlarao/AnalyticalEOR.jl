@@ -1,5 +1,5 @@
 
-function solve_Ion_Transport(ζᵢ, ζⱼ, ec::ExchangeConstants)
+function solve_Ion_Transport(ζᵢ, ζⱼ, ec::IonExchangeProblem)
     cᵢ = ζᵢ .* ec.ν
     cⱼ = ζⱼ .* ec.ν
 
@@ -53,7 +53,8 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ec::ExchangeConstants)
         ĉ[i,:] = isotherm(c[i,:], ec)
     end
 
-    return IonExchangeTransport(ζᵢ,
+    return IonExchangeSolution(
+            ζᵢ,
             ζⱼ,
             ec.ν,
             ec.K₂₁,
@@ -63,13 +64,12 @@ function solve_Ion_Transport(ζᵢ, ζⱼ, ec::ExchangeConstants)
             cᵢ, cₘ₁, cₘ₂, cⱼ,
             c, ĉ , λ, σ,
             𝒲₂, 𝒲₃,
-            sol2, sol3
             )
 end
 
 
 
-function isotherm(c::T, ec::ExchangeConstants) where {T}
+function isotherm(c::T, ec::IonExchangeProblem) where {T}
     K₂₁ = ec.K₂₁
     K₃₁ = ec.K₃₁
     Z = ec.Z
@@ -105,7 +105,7 @@ function isotherm(c::T, ec::ExchangeConstants) where {T}
 end
 
 
-function flowingConcentrations(ĉ, cⱼ₄, ec::ExchangeConstants)
+function flowingConcentrations(ĉ, cⱼ₄, ec::IonExchangeProblem)
     K₂₁ = ec.K₂₁
     K₃₁ = ec.K₃₁
     K₂₃ = ec.K₂₃
@@ -141,7 +141,7 @@ end
 
 
 
-function eigenvectors(c, ec::ExchangeConstants)
+function eigenvectors(c, ec::IonExchangeProblem)
     ĉ₂₂, ĉ₂₃, ĉ₃₂, ĉ₃₃ = derivative_functions(c, ec)
 
 	σ₂ = 1 + (ĉ₂₂ + ĉ₃₃ - sqrt((ĉ₂₂ - ĉ₃₃)^2 + 4ĉ₂₃ * ĉ₃₂)) / 2
@@ -151,7 +151,7 @@ function eigenvectors(c, ec::ExchangeConstants)
 end
 
 
-function derivative_functions(c, ec::ExchangeConstants)
+function derivative_functions(c, ec::IonExchangeProblem)
     ∇(f, x) = derivative(f, x)
 	
     ĉ₂(c₂, c₃, c₄) = isotherm([c₂, c₃, c₄], ec)[2]
@@ -167,7 +167,7 @@ function derivative_functions(c, ec::ExchangeConstants)
 end
 
 
-function dc₂dc₃(c, ec::ExchangeConstants)
+function dc₂dc₃(c, ec::IonExchangeProblem)
     ĉ₂₂, ĉ₂₃, ĉ₃₂, ĉ₃₃ = derivative_functions(c, ec)
 
     σ₂ = 1 + (ĉ₂₂ + ĉ₃₃ - sqrt((ĉ₂₂ - ĉ₃₃)^2 + 4ĉ₂₃ * ĉ₃₂)) / 2
@@ -186,7 +186,7 @@ function integralcurves(u, p, t)
 end
 
 
-function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
+function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::IonExchangeProblem)
     
 
     c₃ = 10 .^ range(log10(cₘ₁[3]), log10(cⱼ[3]), length=10000)
@@ -210,7 +210,7 @@ function M2_ODE2(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
 end
 
 
-function M2_ODE3(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
+function M2_ODE3(c₃ₘ₂, cⱼ, cₘ₁, ec::IonExchangeProblem)
     
     c₃ = 10 .^ range(log10(cⱼ[3]), log10(cₘ₁[3]),  length=10000)
 
@@ -244,7 +244,7 @@ function try_M2_ODE3(c₃₁, cⱼ, cₘ₁, ec)
 end
 
 
-function try_M2_ODE2(c₃₂, cⱼ, cₘ₁, ec::ExchangeConstants)
+function try_M2_ODE2(c₃₂, cⱼ, cₘ₁, ec::IonExchangeProblem)
     try
         sol2 = M2_ODE2(c₃₂, cⱼ, cₘ₁, ec)
         return true
@@ -273,7 +273,7 @@ function binary_search(fun, c1, c2, c3, ec)
 end
 
 
-function solve_IntegralCurve(cₘ₁, cⱼ, ec::ExchangeConstants)
+function solve_IntegralCurve(cₘ₁, cⱼ, ec::IonExchangeProblem)
 	# c₃ₘ₂ = collect(range(cⱼ[3], cₘ₁[3], length=100000))
 	c₃ₘ₂ = collect(10 .^ range(log10(cⱼ[3]), log10(cₘ₁[3]), length=10000))
 	
