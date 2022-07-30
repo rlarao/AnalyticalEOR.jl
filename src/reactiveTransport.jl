@@ -136,7 +136,6 @@ function flowingConcentrations(ĉ, cⱼ₄, ec::ExchangeConstants)
     c₂ = ĉ₂ * c₁^ ν[2] / K₂₁ / ĉ₁ ^ ν[2] 
     c₃ = ĉ₃ * c₁^ ν[3] / K₃₁/ ĉ₁ ^ ν[3] 
 
-# return η₂
     return [c₁, c₂, c₃, cⱼ₄]
 end
 
@@ -220,7 +219,7 @@ function M2_ODE3(c₃ₘ₂, cⱼ, cₘ₁, ec::ExchangeConstants)
 
     prob3 = ODEProblem(f3, 
                     cⱼ[2],				    # u0
-                    (cⱼ[3], c₃ₘ₂), 		# tspan
+                    (cⱼ[3], c₃ₘ₂), 		    # tspan
                     (cⱼ[4], ec))			# p
                     
     sol3 = DifferentialEquations.solve(prob3, RadauIIA5() ,

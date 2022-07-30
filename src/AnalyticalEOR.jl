@@ -4,7 +4,7 @@ using Base:Real
 using ForwardDiff:derivative
 using Roots
 using Plots
-using DifferentialEquations
+using DifferentialEquations:ODEProblem, solve
 
 include("types.jl")
 include("flowFunctions.jl")
