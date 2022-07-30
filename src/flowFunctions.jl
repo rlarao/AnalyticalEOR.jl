@@ -11,13 +11,7 @@ function water_rel_perm(sw::T, swr::P, sor::P, krw0::P, nw::P) where {T,P <: Flo
         krw = 0.0
     end
     
-end
-
-
-function water_rel_perm(sw::AbstractVector{T}, swr::P, sor::P, krw0::P, nw::P) where {T,P <: Float64}
-    water_rel_perm.(sw, swr::P, sor::P, krw0::P, nw::P)
-end
-
+end 
 
 function oil_rel_perm(sw::T, swr::P, sor::P, kro0::P, no::P) where {T,P <: Float64}
 
@@ -32,39 +26,37 @@ function oil_rel_perm(sw::T, swr::P, sor::P, kro0::P, no::P) where {T,P <: Float
     end
 end
 
+#* RelPerms Type
+function water_rel_perm(sw::Float64, kr::RelPerms)
+    water_rel_perm(sw, kr.swr, kr.sor, kr.krw0, kr.nw)
+end
+
+function oil_rel_perm(sw::Float64, kr::RelPerms)
+    oil_rel_perm(sw, kr.swr, kr.sor, kr.kro0, kr.no)
+end
+
+
+
+function water_rel_perm(sw::AbstractVector{T}, swr::P, sor::P, krw0::P, nw::P) where {T,P <: Float64}
+    water_rel_perm.(sw, swr::P, sor::P, krw0::P, nw::P)
+end
+
+
+
+
 
 function oil_rel_perm(sw::AbstractVector{T}, swr::P, sor::P, kro0::P, no::P) where {T,P <: Float64}
     oil_rel_perm.(sw, swr::P, sor::P, kro0::P, no::P)
 end
 
 
-function oil_rel_perm(sw::AbstractVector{T}, kr::RelPerms) where {T,P <: Float64}
-    swr = kr.swr
-    sor = kr.sor
-    kro0 = kr.kro0
-    no = kr.no
-    
-    oil_rel_perm.(sw, swr::P, sor::P, kro0::P, no::P)
-end
-
-
-function water_rel_perm(sw::AbstractVector{T}, kr::RelPerms) where {T,P <: Float64}
-    swr = kr.swr
-    sor = kr.sor
-    krw0 = kr.krw0
-    nw = kr.nw
-    
-    water_rel_perm.(sw, swr::P, sor::P, krw0::P, nw::P)
-end
-
-
 function kro_derivative(sw::T, swr::P, sor::P, kro0::P, no::P) where {T,P <: Float64}
-    ForwardDiff.derivative.(sw ->  oil_rel_perm(sw, swr, sor, kro0, no), sw)
+    derivative.(sw ->  oil_rel_perm(sw, swr, sor, kro0, no), sw)
 end
 
 
 function krw_derivative(sw::AbstractVector{T}, swr::P, sor::P, krw0::P, nw::P) where {T,P <: Float64}
-    ForwardDiff.derivative.(sw ->  water_rel_perm(sw, swr, sor, krw0, nw), sw)
+    derivative.(sw ->  water_rel_perm(sw, swr, sor, krw0, nw), sw)
 end
 
 function fractional_flow(sw::T, swr::P, sor::P, krw0::P, kro0::P, nw::P, no::P, μw::P, μo::P) where {T,P <: Float64}
@@ -101,8 +93,9 @@ end
 
 
 function fw_derivative(sw::Union{T,AbstractVector{T}}, swr::P, sor::P, krw0::P, kro0::P, nw::P, no::P, μw::P, μo::P) where {T,P <: Float64}
-    ForwardDiff.derivative.(sw ->  fractional_flow(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+    derivative.(sw ->  fractional_flow(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
 end
+
 
 function fw_derivative(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo::P) where {T,P <: Float64}
     swr = kr.swr
@@ -112,8 +105,40 @@ function fw_derivative(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo
     kro0 = kr.kro0
     no = kr.no
     
-    ForwardDiff.derivative.(sw ->  fractional_flow(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+    derivative.(sw ->  fractional_flow(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
 end
 
 
+function fw_derivative2(sw::Union{T,AbstractVector{T}}, swr::P, sor::P, krw0::P, kro0::P, nw::P, no::P, μw::P, μo::P) where {T,P <: Float64}
+    derivative.(sw ->  fw_derivative(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
+
+
+function fw_derivative2(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo::P) where {T,P <: Float64}
+    swr = kr.swr
+    sor = kr.sor
+    krw0 = kr.krw0
+    nw = kr.nw
+    kro0 = kr.kro0
+    no = kr.no
+    
+    derivative.(sw ->  fw_derivative(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
+
+
+function fw_derivative3(sw::Union{T,AbstractVector{T}}, swr::P, sor::P, krw0::P, kro0::P, nw::P, no::P, μw::P, μo::P) where {T,P <: Float64}
+    derivative.(sw ->  fw_derivative2(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
+
+
+function fw_derivative3(sw::Union{T,AbstractVector{T}}, kr::RelPerms, μw::P, μo::P) where {T,P <: Float64}
+    swr = kr.swr
+    sor = kr.sor
+    krw0 = kr.krw0
+    nw = kr.nw
+    kro0 = kr.kro0
+    no = kr.no
+    
+    derivative.(sw ->  fw_derivative2(sw, swr, sor, krw0, kro0, nw, no, μw, μo), sw)
+end
 
