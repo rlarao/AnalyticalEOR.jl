@@ -75,28 +75,34 @@ function isotherm(c::T, ec::IonExchangeProblem) where {T}
     Z = ec.Z
     ν = ec.ν
 
-	if size(c)[1] == 4
-		c₁, c₂, c₃ = c
-	else
-		c₂, c₃, c₄ = c
-		c₁ = c₄ - c₃ - c₂
-	end
-
-    β = 1
-    α = 0
-    if ν[2] == 1
-        β += K₂₁ * c₂ / c₁ 
-    elseif ν[2] == 2
-        α += K₂₁ * c₂ / c₁ ^ ν[2]
+    if size(c)[1] == 4
+        c₁, c₂, c₃ = c
+    else
+        c₂, c₃, c₄ = c
+        c₁ = c₄ - c₃ - c₂
     end
 
-    if ν[3] == 1
-        β += K₃₁ * c₃ / c₁ 
-    elseif ν[3] == 2
-        α += K₃₁ * c₃ / c₁ ^ ν[3]
-    end
+    if ν[2] * ν[3] ∈ [2,4]
 
-    ĉ₁ = (-β + sqrt(β^2 + 4 * α * Z)) / (2α)
+        α = 0
+        β = 1
+
+        if ν[2] == 1
+            β += K₂₁ * c₂ / c₁ 
+        elseif ν[2] == 2
+            α += K₂₁ * c₂ / c₁ ^ ν[2]
+        end
+
+        if ν[3] == 1
+            β += K₃₁ * c₃ / c₁ 
+        elseif ν[3] == 2
+            α += K₃₁ * c₃ / c₁ ^ ν[3]
+        end
+
+        ĉ₁ = (-β + sqrt(β^2 + 4 * α * Z)) / (2α)
+    elseif ν[2] * ν[3] == 1
+        ĉ₁ = Z * c₁ / (c₁ + K₂₁ * c₂ + K₃₁ * c₃)
+    end
     
     ĉ₂ = K₂₁ * c₂ * ĉ₁^ν[2] / c₁^ν[2]
     ĉ₃ = K₃₁ * c₃ * ĉ₁^ν[3] / c₁^ν[3]
@@ -112,26 +118,30 @@ function flowingConcentrations(ĉ, cⱼ₄, ec::IonExchangeProblem)
     ν = ec.ν
 
     ĉ₁, ĉ₂, ĉ₃ = ĉ
-    
-    α = 0
-    β = 1
 
-    η₂ =  ĉ₂ / K₂₁ / ĉ₁^ ν[2] 
-    η₃ =  ĉ₃ / K₃₁ / ĉ₁^ ν[3] 
+    A =  ĉ₂ / K₂₁ / ĉ₁^ ν[2] 
+    B =  ĉ₃ / K₃₁ / ĉ₁^ ν[3] 
 
-    if ν[2] == 1
-        β += η₂
-    elseif ν[2] == 2
-        α += η₂
+    if ν[2] * ν[3] == 1
+        c₁ = cⱼ₄ / (A + B + 1)
+    else
+        α = 0
+        β = 1
+
+        if ν[2] == 1
+            β += A
+        elseif ν[2] == 2
+            α += A
+        end
+
+        if ν[3] == 1
+            β += B
+        elseif ν[3] == 2
+            α += B
+        end
+
+        c₁ = (-β + sqrt(β^2 + 4* α * cⱼ₄)) / (2α)
     end
-
-    if ν[3] == 1
-        β += η₃
-    elseif ν[3] == 2
-        α += η₃
-    end
-
-    c₁ = (-β + sqrt(β^2 + 4* α * cⱼ₄)) / (2α)
 
     c₂ = ĉ₂ * c₁^ ν[2] / K₂₁ / ĉ₁ ^ ν[2] 
     c₃ = ĉ₃ * c₁^ ν[3] / K₃₁/ ĉ₁ ^ ν[3] 
