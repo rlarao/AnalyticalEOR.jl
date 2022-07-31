@@ -19,7 +19,7 @@ end
 begin
 	import Pkg
 	Pkg.activate("/home/rick/.julia/dev/AnalyticalEOR/Project.toml")
-	using Revise, AnalyticalEOR, PlutoUI, Plots, Roots, LaTeXStrings
+	using AnalyticalEOR, PlutoUI, Plots, LaTeXStrings
 end
 
 # ╔═╡ 7f366edf-af92-4eb1-828f-1869760a1733
@@ -53,6 +53,9 @@ md"""#### Experiment 3.2 Voegelin et al. (2000)"""
 
 # ╔═╡ b65fca11-04e6-4042-b7ea-79ae83e623cd
 md"""#### Experiment 6.1 Voegelin et al. (2000)"""
+
+# ╔═╡ 8753454d-6a9e-442f-81bf-108803c7d762
+
 
 # ╔═╡ cbdc5f1f-6e7f-4565-a6a4-1301f508566b
 # begin
@@ -128,8 +131,11 @@ begin
 	cec = 0.06
 	Z = cec * ((1 - ϕ) / ϕ) * ρ # Conversion of cation exchange capacity into moles/liter
 	
-	ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z, ν)
+	ec = IonExchangeProblem(K₂₁, K₃₁, K₂₃, Z, ν)
 end
+
+# ╔═╡ 3ee83a07-85cb-4996-82bb-75ff654dee7c
+Z
 
 # ╔═╡ 99bb428f-6f32-41e2-997a-b9d9d34beb2d
 it = solve_Ion_Transport(ζᵢ, ζⱼ, ec)
@@ -153,17 +159,19 @@ plot!(yscale=:log10)
 end
 
 # ╔═╡ Cell order:
-# ╟─d8d0af8e-0c5e-11ed-1370-cb8d2ab22ce7
+# ╠═d8d0af8e-0c5e-11ed-1370-cb8d2ab22ce7
 # ╟─7f366edf-af92-4eb1-828f-1869760a1733
 # ╟─43b3e07f-09ba-4f91-afe8-0d676d2b1d58
 # ╠═b198dd49-34ff-4176-9648-8226936ccce6
 # ╟─b65fca11-04e6-4042-b7ea-79ae83e623cd
+# ╠═8753454d-6a9e-442f-81bf-108803c7d762
 # ╟─cbdc5f1f-6e7f-4565-a6a4-1301f508566b
 # ╠═e6f3b900-efdb-4143-9bc2-57965a5f1a21
 # ╟─f058fde4-864d-4363-8551-6d6ce508f1cc
 # ╠═7fde1209-3683-45db-9a6a-d5a0a8cacc3f
 # ╟─590ad963-6e67-422a-9682-3e12ab2d69b7
 # ╠═febdeadf-fff3-4b3d-ad18-4be6658d62b7
+# ╠═3ee83a07-85cb-4996-82bb-75ff654dee7c
 # ╠═99bb428f-6f32-41e2-997a-b9d9d34beb2d
 # ╟─0193979e-496c-41f7-94ed-4d64364cb6ee
 # ╟─c0184f6b-6c80-4ea3-b6e2-2aceeabeafcc

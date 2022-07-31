@@ -18,7 +18,7 @@ end
 begin
 	import Pkg
 	Pkg.activate("/home/rick/.julia/dev/AnalyticalEOR/Project.toml")
-	using Revise, AnalyticalEOR, PlutoUI, Plots, Roots
+	using AnalyticalEOR, PlutoUI, Plots
 end
 
 # ╔═╡ 06e65237-45da-458e-811a-764920a4526e
@@ -86,17 +86,9 @@ begin
     plot_sat_profile(sol, t)
 end
 
-# ╔═╡ adda3eb2-6af8-4981-be97-11112592bdc1
-function find_shock_spreading2(Δf, df, si, sj, swr, sor) 
-    min_bound = minimum([swr, 1 - sor]) + 0.001
-    max_bound = maximum([swr, 1 - sor]) - 0.001
-
-    return find_zeros(s -> df(s) - Δf.(s, si), min_bound, max_bound)[end]
-end
-
 # ╔═╡ Cell order:
 # ╠═2858e2e6-07dd-11ed-1828-1d526ab9abb9
-# ╠═06e65237-45da-458e-811a-764920a4526e
+# ╟─06e65237-45da-458e-811a-764920a4526e
 # ╠═343d45e0-8762-43c5-abb4-84f0223521c1
 # ╟─0798bba6-bafa-41ce-ad22-2fca894541eb
 # ╟─03be79da-6828-4986-8a4f-1c92254be9ba
@@ -110,4 +102,3 @@ end
 # ╟─e05a97f3-a3ef-473f-aaaf-4aeac2a80ce2
 # ╟─a7157322-a5d9-4374-b38d-7c2baabd73e5
 # ╟─a657c6d2-3ec4-4043-a811-8537b05fb2af
-# ╟─adda3eb2-6af8-4981-be97-11112592bdc1
