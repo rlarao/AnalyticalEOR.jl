@@ -30,5 +30,6 @@ export isotherm2, flowingConcentrations2
 export plot_flowing_conc, plot_adsorbed_conc
 
 export plot_recovery_factor, plot_recovery_factor!
+export plot_chemical_waves, animate_chemical_waves
 
 end

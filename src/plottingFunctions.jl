@@ -68,6 +68,10 @@ function plot_fractional_flow(cf::ChemicalFlooding, sol::Vector)
     xlabel!("Dimensionless Distance, x")
     ylabel!("Water Fractional Flow, f")
 end
+
+
+
+
 # function plot_fw(wf::WaterFlooding)
 #     fw(sw) = fractional_flow(sw, wf.kr, wf.μw, wf.μo)
 #     swi = wf.Si
@@ -307,3 +311,86 @@ function plot_recovery_factor!(sol, tmax, label)
 end
 
 
+
+
+function plot_chemical_waves(sol, t)
+    s, v = get_saturation_speeds(sol)
+    plot(v .* t, s, lims=(0,1), lw=3, label=false, color=:dodgerblue2)
+    xlabel!("Dimensionless distance, x")
+    ylabel!("Saturation, s")
+
+    colors = [:orangered, :darkorchid, :gold]
+
+    s, v = get_saturation_speeds(sol)
+
+    x(c_pos) = min.(v .*t, c_pos)
+
+    shock_sols = [s for s in sol if s[3] == :shock][1:end-1]
+
+    s2 = shock_sols[end-1][2] 
+    f2 = shock_sols[end-1][5](s2)
+
+    tracer_v = f2 / s2
+    shock_sols = vcat(shock_sols, (s2, s2, :shock, tracer_v, f2))
+    
+
+
+    s_old = 1
+    i = 1
+    for (s1, s2, wave, speed, f) in shock_sols
+
+        c_x = x(speed .* t)
+        c_pos = c_x[end]
+        s_i = findfirst(c_x .== c_pos) + 1
+        display(plot!(c_x[s_old:s_i], s[s_old:s_i], fill=(0, 0.2, colors[i]), lw=0., label=false)) 
+
+        # display(plot!([c_x[s_i], c_x[s_i]], [0, s[s_i]], lw=2, ls=:dash, alpha=0.5, color=colors[i], label=false))
+
+        s_old = s_i
+        i += 1
+    end
+end
+
+
+
+
+
+
+
+function animate_chemical_waves(sol, t::Real; dt=0.01)
+    colors = [:orangered, :darkorchid, :gold]
+    s, v = get_saturation_speeds(sol)
+    x(i, c_pos) = min.(v .*i, c_pos)
+
+    shock_sols = [s for s in sol if s[3] == :shock][1:end-1]
+
+    s2 = shock_sols[end-1][2] 
+    f2 = shock_sols[end-1][5](s2)
+
+    tracer_v = f2 / s2
+    shock_sols = vcat(shock_sols, (s2, s2, :shock, tracer_v, f2))
+
+    anim = @animate for i in dt:dt:t
+
+        plot(v .* i, s, lims=(0,1), lw=3, label=false, color=:dodgerblue2)
+        xlabel!("Dimensionless distance, x")
+        ylabel!("Saturation, s")
+
+
+        s_old = 1
+        j = 1
+        for (s1, s2, wave, speed, f) in shock_sols
+
+            c_x = x(i, speed .* i)
+            c_pos = c_x[end]
+            s_i = findfirst(c_x .== c_pos) + 1
+            plot!(c_x[s_old:s_i], s[s_old:s_i], fill=(0, 0.2, colors[j]), lw=0., label=false)
+
+            # display(plot!([c_x[s_i], c_x[s_i]], [0, s[s_i]], lw=2, ls=:dash, alpha=0.5, color=colors[i], label=false))
+
+            s_old = s_i
+            j += 1
+        end
+    end
+    gif(anim)
+end
