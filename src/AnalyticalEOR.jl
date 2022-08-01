@@ -11,6 +11,7 @@ include("flowFunctions.jl")
 include("buckleyLeverett.jl")
 include("plottingFunctions.jl")
 include("reactiveTransport.jl")
+include("utilities.jl")
 
 export RelPerms, WaterFlooding, ChemicalFlooding, solve_cf
 export water_rel_perm, oil_rel_perm, krw_derivative, kro_derivative
@@ -27,5 +28,7 @@ export eigenvectors, integral_eigenvalues, RH_eigenvalues
 export plot_ODEs, plot_velocities
 export isotherm2, flowingConcentrations2
 export plot_flowing_conc, plot_adsorbed_conc
+
+export plot_recovery_factor, plot_recovery_factor!
 
 end

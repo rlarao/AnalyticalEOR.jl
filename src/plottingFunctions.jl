@@ -285,3 +285,25 @@ function plot_adsorbed_conc(it, t, labels, colors)
     xlabel!("Dimensionless distance, x")
     ylabel!("Adsorbed concentration eqmol/L")
 end
+
+function plot_recovery_factor(sol, tmax, label)
+    dt = 0.01
+    PVs = collect(dt:dt:tmax)
+
+    RF = RecoveryFactor(sol, PVs) .* 100
+
+    plot(PVs, RF, ylims=(0,100), label=label)
+    xlabel!("Injected PV")
+    ylabel!("Recovery Factor, %OOIP")
+end
+
+function plot_recovery_factor!(sol, tmax, label)
+    dt = 0.01
+    PVs = collect(dt:dt:tmax)
+
+    RF = RecoveryFactor(sol, PVs) .* 100
+
+    plot!(PVs, RF, ylims=(0,100), label=label)
+end
+
+

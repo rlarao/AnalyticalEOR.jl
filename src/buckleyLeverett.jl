@@ -47,7 +47,10 @@ function get_saturation_speeds(sol)
     insert!(v,1, 0.)
 
     push!(s, s[end])
-    push!(v, 100.)
+    push!(v, 10000.)
+
+    s = convert(Array{Float64, 1}, s)
+    v = convert(Array{Float64, 1}, v)
 
     return s, v
 end
