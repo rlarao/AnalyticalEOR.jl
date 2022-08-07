@@ -1,8 +1,13 @@
-function plot_sat_profile(sol::Vector, t::Real)
+function plot_sat_profile(sol::Vector, t::Real; color=:blue)
     s, v = get_saturation_speeds(sol)
-    plot(v .* t, s, lims=(0,1), lw=3, fill=(0, 0.1), label=false)
+    plot(v .* t, s, lims=(0,1), lw=3, fill=(0, 0.1), label=false, color=color)
     xlabel!("Dimensionless Distance, x")
     ylabel!("Saturation, s")
+end
+
+function plot_sat_profile!(sol::Vector, t::Real; color=:blue)
+    s, v = get_saturation_speeds(sol)
+    plot!(v .* t, s, lims=(0,1), lw=3, label=false, color=color, alpha=0.5)
 end
 
 
@@ -301,13 +306,13 @@ function plot_recovery_factor(sol, tmax, label)
     ylabel!("Recovery Factor, %OOIP")
 end
 
-function plot_recovery_factor!(sol, tmax, label)
+function plot_recovery_factor!(sol, tmax, label, color)
     dt = 0.01
     PVs = collect(dt:dt:tmax)
 
     RF = RecoveryFactor(sol, PVs) .* 100
 
-    plot!(PVs, RF, ylims=(0,100), label=label)
+    plot!(PVs, RF, ylims=(0,100), label=label, color=color)
 end
 
 
