@@ -19,7 +19,7 @@ end
 begin
 	import Pkg
 	Pkg.activate("/home/rick/.julia/dev/AnalyticalEOR/Project.toml")
-	using Revise, AnalyticalEOR, PlutoUI, Plots, Roots
+	using AnalyticalEOR, PlutoUI, Plots, Roots
 end
 
 # ╔═╡ f48e4e8f-3b3c-402d-ad54-084f1d61010c
