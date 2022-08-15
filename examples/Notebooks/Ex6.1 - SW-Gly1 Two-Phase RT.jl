@@ -19,7 +19,7 @@ end
 begin
 	import Pkg
 	Pkg.activate("/home/rick/.julia/dev/AnalyticalEOR/Project.toml")
-	using Revise, AnalyticalEOR, PlutoUI, Plots, Roots, LaTeXStrings
+	using AnalyticalEOR, PlutoUI, Plots, Roots, LaTeXStrings
 end
 
 # ╔═╡ 79399bed-95e7-43ea-bef4-dd56a3364e0c
@@ -62,7 +62,7 @@ begin
     K₃₁ = 10^1.78
     K₂₃ = K₂₁ / K₃₁
 
-	ec = ExchangeConstants(K₂₁, K₃₁, K₂₃, Z, ν)
+	ec = IonExchangeProblem(K₂₁, K₃₁, K₂₃, Z, ν)
 
 end
 
@@ -105,9 +105,6 @@ end
 # ╔═╡ b83d4f0b-f104-4cbd-8a50-17bb7ce51813
 
 
-# ╔═╡ 47fb48e2-c548-43b4-8727-a2ff6b6dcc06
-ĉᵢ = it.ĉ[:,1]
-
 # ╔═╡ 48da0d27-b166-4765-8566-a3d6e22223cc
 begin
 	ĉᵢ = it.ĉ[27,:]
@@ -115,6 +112,9 @@ begin
 	ĉₘ₁ = it.ĉ[23,:]
 	ĉₘ₂ = it.ĉ[19,:]
 end
+
+# ╔═╡ 47fb48e2-c548-43b4-8727-a2ff6b6dcc06
+ĉᵢ = it.ĉ[:,1]
 
 # ╔═╡ Cell order:
 # ╠═d8d0af8e-0c5e-11ed-1370-cb8d2ab22ce7
