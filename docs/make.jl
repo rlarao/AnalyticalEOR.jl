@@ -2,8 +2,6 @@ using Documenter
 using AnalyticalEOR
 
 makedocs(;
-    sitename = "AnalyticalEOR",
-    format = Documenter.HTML(),
     modules = [AnalyticalEOR],
     sitename = "AnalyticalEOR.jl",
     format = Documenter.HTML(),
