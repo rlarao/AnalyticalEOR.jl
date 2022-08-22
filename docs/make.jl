@@ -10,13 +10,13 @@ makedocs(
     pages =[
         "Home" => "index.md",
         "Fractional Flow" => [
-            "Water Flooding" => "fractionalflow/waterflooding.md"
-            "Chemical Flooding" => "fractionalflow/chemicalflooding.md"
+            "Water Flooding" => "fractional_flow/waterflooding.md"
+            "Chemical Flooding" => "fractional_flow/chemicalflooding.md"
         ],
         "Single Phase Reactive Transport" => [
-            "Theory" => "reactivetransport/theory.md"
-            "Solution with Ion Exchange Reactions" => "reactivetransport/ionexchange.md"
-            "Plotting Recipes" => "reactivetransport/plotting.md"
+            "Theory" => "reactive_transport/theory.md"
+            "Solution with Ion Exchange Reactions" => "reactive_transport/ionexchange.md"
+            "Plotting Recipes" => "reactive_transport/plotting.md"
         ]
         
     ]
