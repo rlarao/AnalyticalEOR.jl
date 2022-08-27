@@ -1,11 +1,31 @@
-# [AnalyticalEOR.jl: Instantaneous Spectral Analysis in Julia](https://github.com/rlarao/AnalyticalEOR.jl)
+# [AnalyticalEOR.jl](https://github.com/rlarao/AnalyticalEOR.jl)
+
+
+
+
+
+
 
 ## Installation
+The latest version of AnalyticalEOR.jl can be installed via the built-in package manager in Julia.
 
-### Users
-1) Download [Julia v1.6.4](https://julialang.org/downloads/#long_term_support_release) or later, if you haven't already.
-1) Add AnalyticalEOR package by entering the following at the REPL `]add https://github.com/rlarao/AnalyticalEOR.jl`.
+```julia
+julia>]
+(v1.6) pkg> add https://github.com/rlarao/AnalyticalEOR.jl
+(v1.6) pkg> instantiate
+```
 
-### Developers
-1) Clone the AnalyticalEOR.jl repository to `username/.julia/dev/`.
-2) Enter the package manager in REPL by pressing `]`, then add the package by typing `dev AnalyticalEOR`.
+For development purposes, clone the AnalyticalEOR.jl repository to `~/.julia/dev/`
+```shell
+~/.julia/dev: git clone https://github.com/rlarao/AnalyticalEOR.jl
+```
+
+Then use `dev` to add AnalyticalEOR to Julia's path
+
+```julia
+julia>]
+(v1.6) pkg> dev AnalyticalEOR
+(v1.6) pkg> instantiate
+```
+
+## Developers

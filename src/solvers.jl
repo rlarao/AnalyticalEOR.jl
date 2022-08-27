@@ -43,6 +43,42 @@ function shock_is_admissible(Δf, f, si, sj)
     return ~any(res)
 end
 
+"""
+Function to solve the waterflooding problem.
+
+wf = WaterFlooding
+si = Initial water saturation
+sj = Injection water saturation
+
+returns a list with the saturations, type of wave, specific velocities,
+and fractional flow function
+```
+    [
+        (s1, s2, :spreading, df, f)
+        (s3, s4, :shock, Δf, f)
+    ]
+
+```
+### Example
+```julia
+ kr = RelPerms(swr=0.2,
+                    sor=0.2,
+                    krw0=0.2,
+                    kro0=0.5,
+                    nw= nw,
+                    no=no)
+
+    μw = 1.0
+    μo = 5.0
+
+	wf = WaterFlooding(
+					kr=kr,
+					μw=μw,
+					μo=μo
+    sol = solve_wf(wf, kr.swr, 1 - kr.sor)
+```
+"""
+
 function solve_wf(wf::WaterFlooding, si::Float64, sj::Float64)
     f = wf.f
     df = wf.df
@@ -70,6 +106,7 @@ function solve_wf(wf::WaterFlooding, si::Float64, sj::Float64)
         ] 
     end
 end
+
 
 
 function solve_chemical_flooding(f, df, D, sj, f2, swr, sor)
@@ -103,7 +140,23 @@ function find_cross_f(y, f, si, sj)
 end
 
 
+"""
+Function to solve the waterflooding problem.
 
+wf = ChemicalFlooding
+si = Initial water saturation
+sj = Injection water saturation
+
+returns a list with the saturations, type of wave, specific velocities,
+and fractional flow function
+### Example
+```
+    [
+        (s1, s2, :spreading, df, f)
+        (s3, s4, :shock, Δf, f)
+    ]
+```
+"""
 function solve_cf(cf::ChemicalFlooding, si::Float64, sj::Float64)
     sol = []
 

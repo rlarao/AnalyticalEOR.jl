@@ -15,6 +15,7 @@ makedocs(;
             "Theory" => "reactive_transport/theory.md",
             "Solution with Ion Exchange Reactions" => "reactive_transport/ionexchange.md",
             "Plotting Recipes" => "reactive_transport/plotting.md",
+            "Structs and Functions" => "structs_and_functions.md"
                                                 ],
             ]
 )

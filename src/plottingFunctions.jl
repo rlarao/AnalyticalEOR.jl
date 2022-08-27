@@ -1,3 +1,30 @@
+"""
+Function to plot saturation profile at a given time.
+
+### Example
+```julia
+kr = RelPerms(swr=0.2,
+                sor=0.2,
+                krw0=0.2,
+                kro0=0.5,
+                nw= nw,
+                no=no)
+
+μw = 1.0
+μo = 5.0
+
+wf = WaterFlooding(
+                kr=kr,
+                μw=μw,
+                μo=μo
+                )
+
+sol = solve_wf(wf, kr.swr, 1 - kr.sor)
+
+plot_sat_profile(sol, 0.5)
+```
+
+"""
 function plot_sat_profile(sol::Vector, t::Real)
     s, v = get_saturation_speeds(sol)
     plot(v .* t, s, lims=(0,1), lw=3, fill=(0, 0.1), label=false)
@@ -5,7 +32,32 @@ function plot_sat_profile(sol::Vector, t::Real)
     ylabel!("Saturation, s")
 end
 
+"""
+Function that returns an animation of the saturation profile.
 
+### Example
+```julia
+kr = RelPerms(swr=0.2,
+                sor=0.2,
+                krw0=0.2,
+                kro0=0.5,
+                nw= nw,
+                no=no)
+
+μw = 1.0
+μo = 5.0
+
+wf = WaterFlooding(
+                kr=kr,
+                μw=μw,
+                μo=μo
+                )
+
+sol = solve_wf(wf, kr.swr, 1 - kr.sor)
+
+animate_sat_profile(sol, 0.5, dt=0.01)
+```
+"""
 function animate_sat_profile(sol::Vector, t::Real; dt=0.01)
     s, v = get_saturation_speeds(sol)
     
@@ -16,6 +68,34 @@ function animate_sat_profile(sol::Vector, t::Real; dt=0.01)
     end
     gif(anim)
 end
+
+"""
+Function that returns the fractional flow solution
+
+### Example
+```julia
+kr = RelPerms(swr=0.2,
+                sor=0.2,
+                krw0=0.2,
+                kro0=0.5,
+                nw= nw,
+                no=no)
+
+μw = 1.0
+μo = 5.0
+
+wf = WaterFlooding(
+                kr=kr,
+                μw=μw,
+                μo=μo
+                )
+
+sol = solve_wf(wf, kr.swr, 1 - kr.sor)
+
+plot_fractional_flow(wf, sol)
+```
+
+"""
 
 
 function plot_fractional_flow(wf::WaterFlooding, sol::Vector)
@@ -38,7 +118,33 @@ function plot_fractional_flow(wf::WaterFlooding, sol::Vector)
     ylabel!("Water Fractional Flow, f")
 end
 
+"""
+Function that returns the fractional flow solution
 
+### Example
+```julia
+kr = RelPerms(swr=0.2,
+                sor=0.2,
+                krw0=0.2,
+                kro0=0.5,
+                nw= nw,
+                no=no)
+
+μw = 1.0
+μo = 5.0
+
+wf = WaterFlooding(
+                kr=kr,
+                μw=μw,
+                μo=μo
+                )
+
+sol = solve_wf(wf, kr.swr, 1 - kr.sor)
+
+plot_fractional_flow(wf, sol)
+```
+
+"""
 function plot_fractional_flow(cf::ChemicalFlooding, sol::Vector)
     wf = cf.wf
 
