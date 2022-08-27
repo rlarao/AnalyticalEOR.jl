@@ -4,7 +4,7 @@ using AnalyticalEOR
 makedocs(;
     modules = [AnalyticalEOR],
     sitename = "AnalyticalEOR.jl",
-    format = Documenter.HTML(),
+    format = Documenter.HTML(sidebar_sitename=false),
     pages = [
         "Home" => "index.md",
         "Fractional Flow" => [
@@ -15,8 +15,8 @@ makedocs(;
             "Theory" => "reactive_transport/theory.md",
             "Solution with Ion Exchange Reactions" => "reactive_transport/ionexchange.md",
             "Plotting Recipes" => "reactive_transport/plotting.md",
-            "Structs and Functions" => "structs_and_functions.md"
                                                 ],
+        "Types and Methods" => "types_and_methods.md"
             ]
 )
 

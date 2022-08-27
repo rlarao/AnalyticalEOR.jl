@@ -44,11 +44,9 @@ function shock_is_admissible(Δf, f, si, sj)
 end
 
 """
-Function to solve the waterflooding problem.
+Function to solve the waterflooding problem based on a waterflooding problem,
+initial water saturation `si`, and injection water saturation `si`.
 
-wf = WaterFlooding
-si = Initial water saturation
-sj = Injection water saturation
 
 returns a list with the saturations, type of wave, specific velocities,
 and fractional flow function
@@ -59,6 +57,11 @@ and fractional flow function
     ]
 
 ```
+
+where `df` is a function to calculate the derivative of the water 
+fractional flow `f` when it is a spreading wave, and `Δf` is the
+specific velocity of the shock.
+
 ### Example
 ```julia
  kr = RelPerms(swr=0.2,
@@ -78,7 +81,6 @@ and fractional flow function
     sol = solve_wf(wf, kr.swr, 1 - kr.sor)
 ```
 """
-
 function solve_wf(wf::WaterFlooding, si::Float64, sj::Float64)
     f = wf.f
     df = wf.df
@@ -141,21 +143,23 @@ end
 
 
 """
-Function to solve the waterflooding problem.
+    solve_cf(cf::ChemicalFlooding, si::Float64, sj::Float64)
 
-wf = ChemicalFlooding
-si = Initial water saturation
-sj = Injection water saturation
+Function to solve the chemical flooding problem using the 
+initial water saturation `si` and injection water saturation `sj`.
+
 
 returns a list with the saturations, type of wave, specific velocities,
 and fractional flow function
-### Example
 ```
     [
         (s1, s2, :spreading, df, f)
         (s3, s4, :shock, Δf, f)
     ]
 ```
+where `df` is a function to calculate the derivative of the water 
+fractional flow `f` when it is a spreading wave, and `Δf` is the
+specific velocity of the shock.
 """
 function solve_cf(cf::ChemicalFlooding, si::Float64, sj::Float64)
     sol = []

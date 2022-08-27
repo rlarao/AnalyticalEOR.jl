@@ -30,7 +30,8 @@ end
 
 """
     RelPerms(swr::T, sor::T, krw0::T, kro0, nw::T, no::T) where T <: Float64
-Define water and oil relative permeabilities using Brooks-Corey model.
+
+Type that defines the water and oil relative permeabilities using Brooks-Corey model.
 
 
 ### Example
@@ -60,7 +61,9 @@ struct RelPerms{T <: Float64}
 end
 
 """
-Struct that defines the waterflooding problem in terms of the oil and water 
+    WaterFlooding(;kr::RelPerms, μw::T, μo::T) where T <: Float64
+
+Type that defines the waterflooding problem in terms of the oil and water 
 relative permeabilities and viscosities.
 
 ### Example
@@ -109,7 +112,9 @@ struct WaterFlooding{T <: Real}
 end 
 
 """
-Struct that defines the chemical EOR problem where a chemical is injected
+ChemicalFlooding(;wf::WaterFlooding, krs::Vector{RelPerms{Float64}}, D::Vector{Float64})
+
+Type that defines the chemical EOR problem where a chemical is injected
 to change the fractional flow curve to conditions favorable to oil recovery.
 
 The waterflooding problem is first defined based on the fluids viscosities
@@ -118,7 +123,7 @@ is defined in correspondance to the impact of the injected chemical on the
 oil and water mobilities.
 
 More than one chemical wave can be defined. In the following example there
-are two chemical waves with their corresponding retardation factors.
+are two chemical waves with their corresponding retardation factors `D`.
 
 ### Example
 ```julia
@@ -164,7 +169,6 @@ cf = ChemicalFlooding(
                 D = [0.5, 0.25]
                 )
 
-end
 ```
 
 """

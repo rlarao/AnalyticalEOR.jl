@@ -1,5 +1,7 @@
 """
-Function to plot saturation profile at a given time.
+    plot_sat_profile(sol::Vector, t::Real)
+
+Function to plot saturation profile at a given time `t`.
 
 ### Example
 ```julia
@@ -33,6 +35,7 @@ function plot_sat_profile(sol::Vector, t::Real)
 end
 
 """
+    animate_sat_profile(sol::Vector, t::Real; dt=0.01)
 Function that returns an animation of the saturation profile.
 
 ### Example
@@ -70,6 +73,8 @@ function animate_sat_profile(sol::Vector, t::Real; dt=0.01)
 end
 
 """
+    plot_fractional_flow(wf::WaterFlooding, sol::Vector)
+
 Function that returns the fractional flow solution
 
 ### Example
