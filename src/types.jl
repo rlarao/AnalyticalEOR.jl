@@ -28,6 +28,24 @@ mutable struct IonExchangeSolution
     W3::Symbol
 end
 
+"""
+    RelPerms(swr::T, sor::T, krw0::T, kro0, nw::T, no::T) where T <: Float64
+Define water and oil relative permeabilities using Brooks-Corey model.
+
+
+### Example
+
+```julia
+kr = RelPerms(swr = 0.2,
+              sor = 0.2,
+              krw0 = 0.2,
+              kro0 = 0.5,
+              nw = 1.5, 
+              no = 1.5, 
+              )
+
+```
+"""
 struct RelPerms{T <: Float64}
     swr::T
     sor::T
@@ -41,7 +59,39 @@ struct RelPerms{T <: Float64}
     end
 end
 
+"""
+Struct that defines the waterflooding problem in terms of the oil and water 
+relative permeabilities and viscosities.
 
+### Example
+```julia
+ kr = RelPerms(swr=0.2,
+                    sor=0.2,
+                    krw0=0.2,
+                    kro0=0.5,
+                    nw= nw,
+                    no=no)
+
+    μw = 1.0
+    μo = 5.0
+
+	wf = WaterFlooding(
+					kr=kr,
+					μw=μw,
+					μo=μo
+	)
+```
+
+The WaterFlooding struct holds the function to calculate the water
+fractional flow:
+
+### Example
+```
+s = collect(range(kr.swr, 1 - kr.sor); length=100)
+f = wf.f(s) 
+```
+
+"""
 struct WaterFlooding{T <: Real}
     kr::RelPerms
     μw::Float64
@@ -58,7 +108,66 @@ struct WaterFlooding{T <: Real}
     end
 end 
 
+"""
+Struct that defines the chemical EOR problem where a chemical is injected
+to change the fractional flow curve to conditions favorable to oil recovery.
 
+The waterflooding problem is first defined based on the fluids viscosities
+and relative permeabilities. Then, a second set of relative permeabilities
+is defined in correspondance to the impact of the injected chemical on the 
+oil and water mobilities.
+
+More than one chemical wave can be defined. In the following example there
+are two chemical waves with their corresponding retardation factors.
+
+### Example
+```julia
+# Define the waterflooding problem
+ kr = RelPerms(swr=0.2,
+                    sor=0.2,
+                    krw0=0.2,
+                    kro0=0.5,
+                    nw= nw,
+                    no=no
+                    )
+
+μw = 1.0
+μo = 5.0
+
+wf = WaterFlooding(
+                kr=kr,
+                μw=μw,
+                μo=μo
+                )
+
+# Define second relative permeability
+kr_2 = RelPerms(swr=0.2,
+                sor=0.2,    
+                krw0=0.5,
+                kro0=1.0,
+                nw=3.0,
+                no=2.0
+                )
+
+
+kr3 = RelPerms(swr=0.2,
+                sor=0.2,    
+                krw0=0.2,
+                kro0=1.0,
+                nw=3.0,
+                no=2.0
+                )
+
+cf = ChemicalFlooding(
+                wf = wf,
+                krs = [kr3, kr2],
+                D = [0.5, 0.25]
+                )
+
+end
+```
+
+"""
 struct ChemicalFlooding{T <: Real}
     kr::Vector{RelPerms{Float64}}
     f::Vector{Function}
