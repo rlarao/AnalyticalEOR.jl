@@ -1,11 +1,8 @@
 # [AnalyticalEOR.jl](https://github.com/rlarao/AnalyticalEOR.jl)
 
 A [Julia](http://julialang.org) package with solutions of Enhanced Oil Recovery Methods based on the method of characteristics.
-<p align="center">
-<img src="./assets/chemicaflooding.gif"/>
-</p>
 
-
+![example](assets/chemicaflooding.gif)
 
 ## Installation
 The latest version of AnalyticalEOR.jl can be installed via the built-in package manager in Julia.
